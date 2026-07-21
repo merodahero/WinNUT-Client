@@ -319,6 +319,8 @@ Namespace Controls
         End Sub
 
         Protected Overridable Sub RenderDefaultArc(g As Graphics)
+            ' This method can be overridden by derived classes
+            ' UPSVarGauge overrides this to draw gradient arcs
             If _baseArcRadius > 0 Then
                 Dim radius As Integer = CInt(_baseArcRadius * centerFactor)
                 Dim rect As New Rectangle(Center.X - radius, Center.Y - radius, 2 * radius, 2 * radius)
