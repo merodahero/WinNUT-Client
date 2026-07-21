@@ -1,4 +1,4 @@
-﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
+' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
 ' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -254,7 +254,7 @@ Namespace Models
             If e.Error IsNot Nothing Then
                 ProgressPercent = 0
                 Dim localError = String.Format(My.Resources.UpgradePrefsDialog_ErrorEncountered, e.Error.Message)
-                LogFile.LogTracing("UpgradeWorkComplete with error: " & vbNewLine & e.Error.ToString(),
+                LogFile.LogTracing("UpgradeWorkComplete with error: " & Environment.NewLine & e.Error.ToString(),
                                    LogLvl.LOG_ERROR, Me, localError)
                 MessageBox.Show(localError)
                 Return
@@ -322,7 +322,7 @@ Namespace Models
                         progress += 1
                     Catch ex As Exception
                         ReportProgress(percentComplete, String.Format("Error importing {0}:{2}{1}",
-                        oldPref.Key, vbNewLine, ex.ToString()), LogLvl.LOG_ERROR, Me)
+                        oldPref.Key, Environment.NewLine, ex.ToString()), LogLvl.LOG_ERROR, Me)
                     End Try
                 Next
             Next

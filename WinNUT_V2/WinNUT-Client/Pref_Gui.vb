@@ -1,4 +1,4 @@
-﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
+' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
 ' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -13,6 +13,15 @@ Imports WinNUT_Client_Common
 Public Class Pref_Gui
     Private IsShowed As Boolean = False
     Private PrefsModified As Boolean = False
+
+    ' The older calibration controls are designer-generated.  These read-only
+    ' fields complete the User/NUT comparison without duplicating any setting.
+    Private ReadOnly Tb_NutInputVoltage As New TextBox()
+    Private ReadOnly Tb_NutFrequency As New TextBox()
+    Private ReadOnly Tb_NutInputFrequency As New TextBox()
+    Private ReadOnly Tb_NutOutputVoltage As New TextBox()
+    Private ReadOnly Tb_NutBatteryVoltage As New TextBox()
+    Private ReadOnly Lbl_PowerCalculation As New Label()
 
     Public Event SavedPreferences()
 
@@ -40,6 +49,9 @@ Public Class Pref_Gui
             My.Settings.CAL_VoltOutMax = CInt(Tb_OutV_Max.Text)
             My.Settings.CAL_BattVMin = CInt(Tb_BattV_Min.Text)
             My.Settings.CAL_BattVMax = CInt(Tb_BattV_Max.Text)
+            My.Settings.CAL_InputPowerFactor = CDbl(Tb_Cal_InputPowerFactor.Value)
+            My.Settings.CAL_OutputLoadPowerFactor = CDbl(Tb_Cal_OutputLoadPowerFactor.Value)
+            My.Settings.CAL_NominalOutputPowerW = CInt(Tb_Cal_NominalOutputPowerW.Value)
             My.Settings.MinimizeToTray = CB_Systray.Checked
             My.Settings.MinimizeOnStart = CB_Start_Mini.Checked
             My.Settings.CloseToTray = CB_Close_Tray.Checked
@@ -117,6 +129,9 @@ Public Class Pref_Gui
             Tb_OutV_Max.Text = My.Settings.CAL_VoltOutMax
             Tb_BattV_Min.Text = My.Settings.CAL_BattVMin
             Tb_BattV_Max.Text = My.Settings.CAL_BattVMax
+            Tb_Cal_InputPowerFactor.Value = CDec(My.Settings.CAL_InputPowerFactor)
+            Tb_Cal_OutputLoadPowerFactor.Value = CDec(My.Settings.CAL_OutputLoadPowerFactor)
+            Tb_Cal_NominalOutputPowerW.Value = CDec(My.Settings.CAL_NominalOutputPowerW)
             CB_Systray.Checked = My.Settings.MinimizeToTray
             CB_Start_Mini.Checked = My.Settings.MinimizeOnStart
             CB_Close_Tray.Checked = My.Settings.CloseToTray
@@ -169,14 +184,18 @@ Public Class Pref_Gui
                 Next
             Next
             AddHandler pollingIntervalValue.ValueChanged, AddressOf Event_Ctrl_Value_Changed
+            AddHandler Tb_Cal_InputPowerFactor.ValueChanged, AddressOf Event_Ctrl_Value_Changed
+            AddHandler Tb_Cal_OutputLoadPowerFactor.ValueChanged, AddressOf Event_Ctrl_Value_Changed
+            AddHandler Tb_Cal_NominalOutputPowerW.ValueChanged, AddressOf Event_Ctrl_Value_Changed
 
+            UpdatePowerCalculationSourceStatus()
             SetLogControlsStatus()
             IsShowed = True
             LogFile.LogTracing("Pref Gui Opened.", LogLvl.LOG_DEBUG, Me)
         Catch Except As Exception
             IsShowed = False
             Close()
-            LogFile.LogTracing("Error on Opening Pref_Gui:" & vbNewLine & Except.ToString(), LogLvl.LOG_ERROR, Me)
+            LogFile.LogTracing("Error on Opening Pref_Gui:" & Environment.NewLine & Except.ToString(), LogLvl.LOG_ERROR, Me)
         End Try
     End Sub
 
@@ -298,9 +317,103 @@ Public Class Pref_Gui
         If TabControl_Options.SelectedTab Is Tab_Miscellanous Then
             SetLogControlsStatus()
         End If
+        If e.TabPage Is Tab_Calibrage Then
+            UpdatePowerCalculationSourceStatus()
+        End If
+    End Sub
+
+    Private Sub UpdatePowerCalculationSourceStatus()
+        If WinNUT.UPS_Device Is Nothing Then
+            Lbl_LoadUPS.Text = "Power source: Preferences (not connected)"
+            Tb_NutInputPowerFactor.Text = "Not connected"
+            Tb_NutOutputLoadPowerFactor.Text = "Not connected"
+            Tb_NutNominalOutputPowerW.Text = "Not connected"
+            SetNUTCalibrationValues("Not connected", "Not connected", "Not connected", "Not connected", "Not connected")
+        Else
+            Lbl_LoadUPS.Text = "Power source: " & WinNUT.UPS_Device.PowerCalculationSourceDescription
+            Dim nutValues = WinNUT.UPS_Device.GetPowerCalculationNUTValues()
+            Tb_NutInputPowerFactor.Text = If(nutValues.InputPowerFactor.HasValue, nutValues.InputPowerFactor.Value.ToString("0.00"), "Not reported")
+            Tb_NutOutputLoadPowerFactor.Text = If(nutValues.OutputLoadPowerFactor.HasValue, nutValues.OutputLoadPowerFactor.Value.ToString("0.00"), "Not reported")
+            Tb_NutNominalOutputPowerW.Text = If(nutValues.NominalOutputPowerW.HasValue, nutValues.NominalOutputPowerW.Value.ToString(), "Not reported")
+
+            Dim values = WinNUT.UPS_Device.UPS_Datas.UPS_Value
+            SetNUTCalibrationValues(
+                FormatNUTValue(values.Input_Voltage, "0.## V"),
+                FormatNUTValue(values.Power_Frequency, "0.## Hz"),
+                FormatNUTValue(values.Power_Frequency, "0.## Hz"),
+                FormatNUTValue(values.Output_Voltage, "0.## V"),
+                FormatNUTValue(values.Batt_Voltage, "0.## V"))
+        End If
+    End Sub
+
+    Private Shared Function FormatNUTValue(value As Double, format As String) As String
+        Return If(value > 0, value.ToString(format), "Not reported")
+    End Function
+
+    Private Sub SetNUTCalibrationValues(inputVoltage As String, frequency As String, inputFrequency As String, outputVoltage As String, batteryVoltage As String)
+        Tb_NutInputVoltage.Text = inputVoltage
+        Tb_NutFrequency.Text = frequency
+        Tb_NutInputFrequency.Text = inputFrequency
+        Tb_NutOutputVoltage.Text = outputVoltage
+        Tb_NutBatteryVoltage.Text = batteryVoltage
+    End Sub
+
+    Private Sub ConfigureCalibrationLayout()
+        ClientSize = New Size(720, 500)
+        MinimumSize = New Size(736, 538)
+        TabControl_Options.SetBounds(12, 12, 696, 430)
+        Btn_Ok.Location = New Point(462, 452)
+        Btn_Apply.Location = New Point(543, 452)
+        Btn_Cancel.Location = New Point(624, 452)
+
+        Tab_Calibrage.AutoScroll = False
+        Lbl_Mini.Text = "Minimum"
+        Lbl_Maxi.Text = "Maximum"
+        Lbl_Mini.SetBounds(185, 22, 70, 16)
+        Lbl_Maxi.SetBounds(285, 22, 70, 16)
+        Lbl_UserValues.Text = "Your settings"
+        Lbl_UserValues.SetBounds(185, 4, 120, 16)
+        Lbl_NutValues.Text = "NUT report (read-only)"
+        Lbl_NutValues.SetBounds(410, 4, 150, 16)
+
+        ConfigureCalibrationRow(Lbl_InputV, Tb_InV_Min, Tb_InV_Max, Tb_NutInputVoltage, 48, "Input voltage")
+        ConfigureCalibrationRow(Lbl_PowerF, Cbx_Freq_Input, Nothing, Tb_NutFrequency, 78, "Nominal frequency")
+        ConfigureCalibrationRow(Lbl_InputF, Tb_InF_Min, Tb_InF_Max, Tb_NutInputFrequency, 108, "Input frequency")
+        ConfigureCalibrationRow(Lbl_OutputV, Tb_OutV_Min, Tb_OutV_Max, Tb_NutOutputVoltage, 138, "Output voltage")
+        ConfigureCalibrationRow(Lbl_BattV, Tb_BattV_Min, Tb_BattV_Max, Tb_NutBatteryVoltage, 168, "Battery voltage")
+
+        Lbl_PowerCalculation.Text = "Power calculation fallbacks"
+        Lbl_PowerCalculation.Font = New Font(Lbl_PowerCalculation.Font, FontStyle.Bold)
+        Lbl_PowerCalculation.SetBounds(16, 208, 200, 18)
+        If Not Tab_Calibrage.Controls.Contains(Lbl_PowerCalculation) Then Tab_Calibrage.Controls.Add(Lbl_PowerCalculation)
+
+        Lbl_InputPowerFactor.SetBounds(16, 238, 150, 20)
+        Lbl_OutputLoadPowerFactor.SetBounds(16, 268, 150, 20)
+        Lbl_NominalOutputPowerW.SetBounds(16, 298, 150, 20)
+        Tb_Cal_InputPowerFactor.SetBounds(185, 236, 80, 22)
+        Tb_Cal_OutputLoadPowerFactor.SetBounds(185, 266, 80, 22)
+        Tb_Cal_NominalOutputPowerW.SetBounds(185, 296, 80, 22)
+        Tb_NutInputPowerFactor.SetBounds(410, 236, 145, 22)
+        Tb_NutOutputLoadPowerFactor.SetBounds(410, 266, 145, 22)
+        Tb_NutNominalOutputPowerW.SetBounds(410, 296, 145, 22)
+        Lbl_LoadUPS.SetBounds(16, 338, 650, 36)
+    End Sub
+
+    Private Sub ConfigureCalibrationRow(rowLabel As Label, userFirst As Control, userSecond As Control, nutValue As TextBox, y As Integer, labelText As String)
+        rowLabel.Text = labelText
+        rowLabel.SetBounds(16, y + 3, 155, 20)
+        userFirst.SetBounds(185, y, 80, 22)
+        If userSecond IsNot Nothing Then userSecond.SetBounds(285, y, 80, 22)
+
+        nutValue.ReadOnly = True
+        nutValue.TabStop = False
+        nutValue.SetBounds(410, y, 145, 22)
+        nutValue.BackColor = SystemColors.Window
+        If Not Tab_Calibrage.Controls.Contains(nutValue) Then Tab_Calibrage.Controls.Add(nutValue)
     End Sub
 
     Private Sub Pref_Gui_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ConfigureCalibrationLayout()
         Icon = WinNUT.Icon
         LogFile.LogTracing("Load Pref Gui", LogLvl.LOG_DEBUG, Me)
     End Sub

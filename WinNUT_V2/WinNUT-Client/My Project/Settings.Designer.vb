@@ -482,6 +482,42 @@ Namespace My
                 Me("CAL_BattVMax") = value
             End Set
         End Property
+
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.95")>  _
+        Public Property CAL_InputPowerFactor() As Double
+            Get
+                Return CType(Me("CAL_InputPowerFactor"),Double)
+            End Get
+            Set
+                Me("CAL_InputPowerFactor") = value
+            End Set
+        End Property
+
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.95")>  _
+        Public Property CAL_OutputLoadPowerFactor() As Double
+            Get
+                Return CType(Me("CAL_OutputLoadPowerFactor"),Double)
+            End Get
+            Set
+                Me("CAL_OutputLoadPowerFactor") = value
+            End Set
+        End Property
+
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("2400")>  _
+        Public Property CAL_NominalOutputPowerW() As Integer
+            Get
+                Return CType(Me("CAL_NominalOutputPowerW"),Integer)
+            End Get
+            Set
+                Me("CAL_NominalOutputPowerW") = value
+            End Set
+        End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _

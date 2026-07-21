@@ -8,7 +8,99 @@ Imports System.Windows.Forms
 Public Class UPS_Device
 #Region "Statics/Defaults"
     Private ReadOnly INVARIANT_CULTURE = CultureInfo.InvariantCulture
-    Private Const POWER_FACTOR = 0.8
+    Private Const INPUT_POWER_FACTOR_DEFAULT = 0.95
+    Private Const OUTPUT_LOAD_POWER_FACTOR_DEFAULT = 0.95
+    Private Const NOMINAL_OUTPUT_POWER_DEFAULT = 2400
+
+    Public NotInheritable Class RuntimeConfig
+        Public Shared InputPowerFactor As Double = INPUT_POWER_FACTOR_DEFAULT
+        Public Shared OutputLoadPowerFactor As Double = OUTPUT_LOAD_POWER_FACTOR_DEFAULT
+        Public Shared NominalOutputPowerW As Integer = NOMINAL_OUTPUT_POWER_DEFAULT
+    End Class
+
+    Private ReadOnly Property INPUT_POWER_FACTOR As Double
+        Get
+            Dim powerFactor = RuntimeConfig.InputPowerFactor
+            If powerFactor <= 0.0 OrElse powerFactor > 1.0 Then Return INPUT_POWER_FACTOR_DEFAULT
+            Return powerFactor
+        End Get
+    End Property
+
+    Private ReadOnly Property OUTPUT_LOAD_POWER_FACTOR As Double
+        Get
+            Dim powerFactor = RuntimeConfig.OutputLoadPowerFactor
+            If powerFactor <= 0.0 OrElse powerFactor > 1.0 Then Return OUTPUT_LOAD_POWER_FACTOR_DEFAULT
+            Return powerFactor
+        End Get
+    End Property
+
+    Private ReadOnly Property NOMINAL_OUTPUT_POWER As Integer
+        Get
+            Dim nominalPower = RuntimeConfig.NominalOutputPowerW
+            If nominalPower <= 0 Then Return NOMINAL_OUTPUT_POWER_DEFAULT
+            Return nominalPower
+        End Get
+    End Property
+
+    Public NotInheritable Class PowerCalculationNUTValues
+        Public Property InputPowerFactor As Nullable(Of Double)
+        Public Property OutputLoadPowerFactor As Nullable(Of Double)
+        Public Property NominalOutputPowerW As Nullable(Of Integer)
+    End Class
+
+    Public Function GetPowerCalculationNUTValues() As PowerCalculationNUTValues
+        Dim values As New PowerCalculationNUTValues()
+        If Not IsConnected Then Return values
+
+        Try
+            Dim inputPowerFactor = Double.Parse(GetUPSVar("input.powerfactor"), INVARIANT_CULTURE)
+            If inputPowerFactor > 0.0 AndAlso inputPowerFactor <= 1.0 Then values.InputPowerFactor = inputPowerFactor
+        Catch
+            Try
+                Dim inputRealPower = Double.Parse(GetUPSVar("input.realpower"), INVARIANT_CULTURE)
+                Dim inputApparentPower = Double.Parse(GetUPSVar("input.power"), INVARIANT_CULTURE)
+                Dim inputPowerFactor = inputRealPower / inputApparentPower
+                If inputPowerFactor > 0.0 AndAlso inputPowerFactor <= 1.0 Then values.InputPowerFactor = inputPowerFactor
+            Catch
+            End Try
+        End Try
+
+        Try
+            Dim outputPowerFactor = Double.Parse(GetUPSVar("output.powerfactor"), INVARIANT_CULTURE)
+            If outputPowerFactor > 0.0 AndAlso outputPowerFactor <= 1.0 Then values.OutputLoadPowerFactor = outputPowerFactor
+        Catch
+        End Try
+
+        Try
+            Dim nominalOutputPower = Double.Parse(GetUPSVar({"ups.realpower.nominal", "output.realpower.nominal"}), INVARIANT_CULTURE)
+            If nominalOutputPower > 0.0 AndAlso nominalOutputPower <= Integer.MaxValue Then values.NominalOutputPowerW = CInt(nominalOutputPower)
+        Catch
+        End Try
+
+        Return values
+    End Function
+
+    Public ReadOnly Property PowerCalculationSourceDescription As String
+        Get
+            If Not IsConnected Then Return "Power calculation preferences will be used after connecting."
+
+            Select Case _PowerCalculationMethod
+                Case PowerMethod.RealPower, PowerMethod.RealOutputPower
+                    Return "NUT real-power reading is in use."
+                Case PowerMethod.InputNomVALoadPct
+                    Dim powerFactor = INPUT_POWER_FACTOR
+                    Return $"Input PF {powerFactor.ToString("0.00", INVARIANT_CULTURE)} from Preferences."
+                Case PowerMethod.OutputVACalc
+                    Dim powerFactor = OUTPUT_LOAD_POWER_FACTOR
+                    Return $"Output PF {powerFactor.ToString("0.00", INVARIANT_CULTURE)} from Preferences."
+                Case PowerMethod.RPNomLoadPct
+                    Dim nominalPower = NOMINAL_OUTPUT_POWER
+                    Return $"Nominal output power {nominalPower} W from Preferences."
+                Case Else
+                    Return "No power calculation source is available."
+            End Select
+        End Get
+    End Property
 
     ' How many milliseconds to wait before the Reconnect routine tries again.
     Private Const DEFAULT_RECONNECT_WAIT_MS As Double = 5000
@@ -291,7 +383,7 @@ Public Class UPS_Device
             End If
         Catch
             Try
-                GetUPSVar("ups.realpower.nominal")
+                GetUPSVar({"ups.realpower.nominal", "output.realpower.nominal"})
                 GetUPSVar("ups.load")
                 _PowerCalculationMethod = PowerMethod.RPNomLoadPct
                 LogFile.LogTracing("Using RPNomLoadPct method.", LogLvl.LOG_NOTICE, Me)
@@ -308,8 +400,14 @@ Public Class UPS_Device
                         _PowerCalculationMethod = PowerMethod.OutputVACalc
                         LogFile.LogTracing("Using OutputVACalc method.", LogLvl.LOG_NOTICE, Me)
                     Else
-                        _PowerCalculationMethod = PowerMethod.Unavailable
-                        LogFile.LogTracing("Unable to find a suitable method to calculate power usage.", LogLvl.LOG_WARNING, Me)
+                        Try
+                            GetUPSVar("ups.load")
+                            _PowerCalculationMethod = PowerMethod.RPNomLoadPct
+                            LogFile.LogTracing("Using RPNomLoadPct fallback method.", LogLvl.LOG_NOTICE, Me)
+                        Catch
+                            _PowerCalculationMethod = PowerMethod.Unavailable
+                            LogFile.LogTracing("Unable to find a suitable method to calculate power usage.", LogLvl.LOG_WARNING, Me)
+                        End Try
                     End If
                 End Try
             End Try
@@ -353,18 +451,18 @@ Public Class UPS_Device
                                     parsedValue = Single.Parse(GetUPSVar("output.realpower"), INVARIANT_CULTURE)
 
                                 Case PowerMethod.RPNomLoadPct
-                                    parsedValue = Double.Parse(GetUPSVar("ups.realpower.nominal"), INVARIANT_CULTURE)
+                                    parsedValue = NOMINAL_OUTPUT_POWER
                                     parsedValue *= UPS_Datas.UPS_Value.Load / 100.0
 
                                 Case PowerMethod.InputNomVALoadPct
                                     Dim nomCurrent = Double.Parse(GetUPSVar("input.current.nominal"), INVARIANT_CULTURE)
                                     Dim nomVoltage = Double.Parse(GetUPSVar("input.voltage.nominal"), INVARIANT_CULTURE)
 
-                                    parsedValue = nomCurrent * nomVoltage * POWER_FACTOR
+                                    parsedValue = nomCurrent * nomVoltage * INPUT_POWER_FACTOR
                                     parsedValue *= UPS_Datas.UPS_Value.Load / 100.0
                                 Case PowerMethod.OutputVACalc
                                     .Output_Current = Single.Parse(GetUPSVar("output.current"), INVARIANT_CULTURE)
-                                    parsedValue = .Output_Current * .Output_Voltage * POWER_FACTOR
+                                    parsedValue = .Output_Current * .Output_Voltage * OUTPUT_LOAD_POWER_FACTOR
                                 Case Else
                                     ' Should not trigger - something has gone wrong.
                                     Throw New InvalidOperationException("Reached Else case when attempting to get power output for method " & _PowerCalculationMethod)

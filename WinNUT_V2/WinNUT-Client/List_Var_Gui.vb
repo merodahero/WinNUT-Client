@@ -1,4 +1,4 @@
-﻿Imports WinNUT_Client_Common
+Imports WinNUT_Client_Common
 
 Public Class List_Var_Gui
     Private List_Var_Datas As List(Of UPS_List_Datas)
@@ -31,7 +31,7 @@ Public Class List_Var_Gui
             UPSDevice.IsUpdatingData = True
         Catch ex As Exception
             ' TODO: Internationalize?
-            MessageBox.Show("Error encountered trying to get variables from the UPS: " & vbNewLine & ex.Message, "Error Encountered")
+            MessageBox.Show("Error encountered trying to get variables from the UPS: " & Environment.NewLine & ex.Message, "Error Encountered")
             ' Close()
             Return
         End Try

@@ -1,5 +1,5 @@
 ﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
-' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
+' Copyright (C) 2019-2024 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
 ' GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -9,12 +9,11 @@
 
 Imports System.ComponentModel
 Imports System.Drawing.Drawing2D
-Imports AGaugeClassic
 
 Namespace Controls
 
     Friend Class UPSVarGauge
-        Inherits AGauge
+        Inherits CustomGauge
 
 #Region "Private Fields"
 
@@ -49,14 +48,14 @@ Namespace Controls
         Private ReadOnly m_ScaleNumbersStepScaleLines = 1
         Private ReadOnly m_ScaleNumbersRotation As Integer
 
-        Private ReadOnly m_NeedleType As NeedleType
         Private ReadOnly m_NeedleRadius = 32
-        Private ReadOnly m_NeedleColor1 = AGaugeNeedleColor.Gray
+        Private ReadOnly m_NeedleColor1 = Color.Gray
         Private ReadOnly m_NeedleColor2 = Color.DimGray
         Private ReadOnly m_NeedleWidth = 2
 
         Private m_gradientType = GradientTypeEnum.RedGreen
         Private m_gradientOrientation = GradientOrientationEnum.BottomToTop
+        Private m_colorProfile = GaugeColorProfile.CenterNormal
         Private m_unitvalue1 = UnitValueEnum.Volts
         Private m_unitvalue2 = UnitValueEnum.None
 
@@ -70,7 +69,7 @@ Namespace Controls
                 Description("First value to display.")>
         Public Property Value1 As Single
             Get
-                Return Value
+                Return MyBase.Value
             End Get
             Set(value As Single)
                 MyBase.Value = value
@@ -87,8 +86,8 @@ Namespace Controls
             Set(value As Single)
                 If m_value2 <> value Then
                     m_value2 = value
-                    OnValueChanged(Me, Nothing)
-                    Refresh()
+                    OnValueChanged(Me, EventArgs.Empty)
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -102,7 +101,7 @@ Namespace Controls
             End Get
             Set(value As GradientTypeEnum)
                 m_gradientType = value
-                Refresh()
+                Me.Invalidate()
             End Set
         End Property
 
@@ -117,7 +116,22 @@ Namespace Controls
 
                 If m_gradientOrientation <> value Then
                     m_gradientOrientation = value
-                    Refresh()
+                    Me.Invalidate()
+                End If
+            End Set
+        End Property
+
+        <Browsable(True),
+                Category("AGauge"),
+                Description("Semantic colour profile for this UPS measurement.")>
+        Public Property ColorProfile As GaugeColorProfile
+            Get
+                Return m_colorProfile
+            End Get
+            Set(value As GaugeColorProfile)
+                If m_colorProfile <> value Then
+                    m_colorProfile = value
+                    Invalidate()
                 End If
             End Set
         End Property
@@ -133,7 +147,7 @@ Namespace Controls
 
                 If m_unitvalue1 <> value Then
                     m_unitvalue1 = value
-                    Refresh()
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -149,7 +163,7 @@ Namespace Controls
 
                 If m_unitvalue2 <> value Then
                     m_unitvalue2 = value
-                    Refresh()
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -168,6 +182,15 @@ Namespace Controls
             LeftToRight
         End Enum
 
+        Public Enum GaugeColorProfile
+            ' Low and high readings are unsafe; the nominal middle band is healthy.
+            CenterNormal
+            ' Higher readings are healthier, such as battery charge or battery voltage.
+            IncreasingHealthy
+            ' Higher readings are riskier, such as UPS load.
+            IncreasingRisk
+        End Enum
+
         Public Enum UnitValueEnum
             None
             Hertz
@@ -178,59 +201,24 @@ Namespace Controls
 
         Public Sub New()
             MyBase.New()
-            InitializeComponent()
-
-            Size = New Size(148, 130)
+            ' Initialize component if it exists, but don't fail if it doesn't
+            Try
+                InitializeComponent()
+            Catch ex As Exception
+                ' Designer component initialization is optional for this control
+            End Try
         End Sub
 
-        Overrides Sub RenderDefaultArc(graphics As Graphics)
-            If m_BaseArcRadius > 0 Then
-                Dim baseArcRadius As Integer = m_BaseArcRadius * centerFactor
-
-                If m_gradientType = GradientTypeEnum.None Then
-                    Using pnArc = New Pen(BaseArcColor, m_BaseArcWidth * centerFactor)
-                        graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
-                                                                  Center.Y - baseArcRadius,
-                                                                  2 * baseArcRadius,
-                                                                  2 * baseArcRadius),
-                                             m_BaseArcStart, m_BaseArcSweep)
-                    End Using
-
-                Else
-                    Dim GradientP1Brush = New Point(0, (Center.X + baseArcRadius + m_BaseArcWidth + 2))
-                    Dim GradientP2Brush = New Point(0, (Center.X - baseArcRadius - m_BaseArcWidth - 2))
-
-                    Select Case m_gradientOrientation
-                        Case GradientOrientationEnum.TopToBottom
-                            GradientP1Brush = New Point(0, (Center.Y - baseArcRadius - m_BaseArcWidth - 2))
-                            GradientP2Brush = New Point(0, (Center.Y + baseArcRadius + m_BaseArcWidth + 2))
-                        Case GradientOrientationEnum.BottomToTop
-                            GradientP1Brush = New Point(0, (Center.Y + baseArcRadius + m_BaseArcWidth + 2))
-                            GradientP2Brush = New Point(0, (Center.Y - baseArcRadius - m_BaseArcWidth - 2))
-                        Case GradientOrientationEnum.RightToLeft
-                            GradientP1Brush = New Point((Center.X + baseArcRadius + m_BaseArcWidth + 2), 0)
-                            GradientP2Brush = New Point((Center.X - baseArcRadius - m_BaseArcWidth - 2), 0)
-                        Case GradientOrientationEnum.LeftToRight
-                            GradientP1Brush = New Point((Center.X - baseArcRadius - m_BaseArcWidth - 2), 0)
-                            GradientP2Brush = New Point((Center.X + baseArcRadius + m_BaseArcWidth + 2), 0)
-                    End Select
-
-                    Dim myArc1Gradient = New LinearGradientBrush(GradientP1Brush, GradientP2Brush, Color.Red, Color.Green)
-                    Using pnArc = New Pen(myArc1Gradient, m_BaseArcWidth * centerFactor)
-                        graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
-                                                                  Center.Y - baseArcRadius,
-                                                                  2 * baseArcRadius,
-                                                                  2 * baseArcRadius),
-                                             m_BaseArcStart, m_BaseArcSweep)
-                    End Using
-                End If
-            End If
+        Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
+            ' The gradient is drawn once in PostRender, after all base painting.
         End Sub
 
         ''' <summary>
         ''' Override PostRender and render the value of the gauge with unit.
         ''' </summary>
-        Overrides Sub PostRender(graphics As Graphics)
+        Protected Overrides Sub PostRender(graphics As Graphics)
+            RenderGradientOverlay(graphics)
+
             Dim PenString = New Pen(Color.Black)
             Dim PenFontV1 = New Font("Microsoft Sans Serif", 8, FontStyle.Bold)
             Dim PenFontV2 = New Font("Microsoft Sans Serif", 7, FontStyle.Bold)
@@ -256,8 +244,45 @@ Namespace Controls
             End If
         End Sub
 
-        Private Function ApplyUnit(value As String, unit As UnitValueEnum)
-            Dim returnStr = value
+        ''' <summary>
+        ''' Draw the coloured band after the base gauge has rendered its scale.
+        ''' PostRender is known to run for every visible gauge, so this avoids the
+        ''' inherited arc path being obscured or skipped during custom painting.
+        ''' </summary>
+        Private Sub RenderGradientOverlay(graphics As Graphics)
+            Dim radius As Integer = Math.Max(1, CInt(Math.Min(Width, Height) * 0.39F))
+            Dim strokeWidth As Single = Math.Max(4.0F, BaseArcWidth * centerFactor)
+            Dim rect As New Rectangle(Center.X - radius, Center.Y - radius, radius * 2, radius * 2)
+
+            Dim colors As Color()
+            Dim thresholds As Single()
+
+            Select Case ColorProfile
+                Case GaugeColorProfile.IncreasingHealthy
+                    ' Battery: low charge/voltage is critical; the upper half is healthy.
+                    colors = {Color.Firebrick, Color.Goldenrod, Color.ForestGreen}
+                    thresholds = {0.0F, 0.25F, 0.5F, 1.0F}
+                Case GaugeColorProfile.IncreasingRisk
+                    ' Load: low utilisation is healthy; near capacity is critical.
+                    colors = {Color.ForestGreen, Color.Goldenrod, Color.Firebrick}
+                    thresholds = {0.0F, 0.6F, 0.8F, 1.0F}
+                Case Else
+                    ' Voltage/frequency: both extremes are unsafe; the central band is normal.
+                    colors = {Color.Firebrick, Color.Goldenrod, Color.ForestGreen, Color.Goldenrod, Color.Firebrick}
+                    thresholds = {0.0F, 0.1F, 0.2F, 0.8F, 0.9F, 1.0F}
+            End Select
+
+            For index As Integer = 0 To colors.Length - 1
+                Dim startAngle As Single = 135.0F + (270.0F * thresholds(index))
+                Dim sweepAngle As Single = 270.0F * (thresholds(index + 1) - thresholds(index))
+                Using pen As New Pen(colors(index), strokeWidth)
+                    graphics.DrawArc(pen, rect, startAngle, sweepAngle)
+                End Using
+            Next
+        End Sub
+
+        Private Function ApplyUnit(value As Single, unit As UnitValueEnum) As String
+            Dim returnStr = value.ToString("F1")
 
             Select Case unit
                 Case UnitValueEnum.Hertz

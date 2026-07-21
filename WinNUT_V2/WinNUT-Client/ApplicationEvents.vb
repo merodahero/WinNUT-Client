@@ -1,4 +1,4 @@
-﻿Imports System.Configuration
+Imports System.Configuration
 Imports System.Globalization
 Imports System.IO
 Imports System.Text.RegularExpressions
@@ -74,12 +74,12 @@ Namespace My
 
             With Msg_Crash
                 .Location = New Point(6, 6)
-                .Text = "WinNUT has encountered a critical error and will close soon." & vbNewLine &
-                    "You can :" & vbNewLine &
-                    "- generate a crash report which will contain most of the configured parameters (without sensitive" & vbNewLine &
-                    "  information such as your connection information to your NUT server), the last 50 events logged" & vbNewLine &
-                    "  and the error message displayed below." & vbNewLine &
-                    "  This information will Then be copied To your clipboard For easy reporting." & vbNewLine &
+                .Text = "WinNUT has encountered a critical error and will close soon." & Environment.NewLine &
+                    "You can :" & Environment.NewLine &
+                    "- generate a crash report which will contain most of the configured parameters (without sensitive" & Environment.NewLine &
+                    "  information such as your connection information to your NUT server), the last 50 events logged" & Environment.NewLine &
+                    "  and the error message displayed below." & Environment.NewLine &
+                    "  This information will Then be copied To your clipboard For easy reporting." & Environment.NewLine &
                     "- simply close WinNUT without generating a report."
                 .Size = New Point(470, 100)
             End With
