@@ -382,23 +382,23 @@ Partial Class WinNUT
         '
         'AG_InV
         '
-        Me.AG_InV.BaseArcRadius = 45
-        Me.AG_InV.BaseArcWidth = 5
+        Me.AG_InV.BaseArcRadius = 110
+        Me.AG_InV.BaseArcWidth = 12
         Me.AG_InV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_InV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_InV, "AG_InV")
         Me.AG_InV.MaxValue = 100
         Me.AG_InV.MinValue = 0
         Me.AG_InV.Name = "AG_InV"
-        Me.AG_InV.NeedleRadius = 32
-        Me.AG_InV.ScaleLinesInterInnerRadius = 40
-        Me.AG_InV.ScaleLinesInterOuterRadius = 48
-        Me.AG_InV.ScaleLinesMajorInnerRadius = 40
-        Me.AG_InV.ScaleLinesMajorOuterRadius = 48
-        Me.AG_InV.ScaleLinesMinorInnerRadius = 42
-        Me.AG_InV.ScaleLinesMinorOuterRadius = 48
+        Me.AG_InV.NeedleRadius = 105
+        Me.AG_InV.ScaleLinesInterInnerRadius = 105
+        Me.AG_InV.ScaleLinesInterOuterRadius = 115
+        Me.AG_InV.ScaleLinesMajorInnerRadius = 105
+        Me.AG_InV.ScaleLinesMajorOuterRadius = 115
+        Me.AG_InV.ScaleLinesMinorInnerRadius = 108
+        Me.AG_InV.ScaleLinesMinorOuterRadius = 115
         Me.AG_InV.ScaleNumbersFormat = Nothing
-        Me.AG_InV.ScaleNumbersRadius = 60
+        Me.AG_InV.ScaleNumbersRadius = 125
         Me.AG_InV.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Volts
         Me.AG_InV.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.None
         Me.AG_InV.Value = 0!
@@ -420,23 +420,23 @@ Partial Class WinNUT
         '
         'AG_OutV
         '
-        Me.AG_OutV.BaseArcRadius = 45
-        Me.AG_OutV.BaseArcWidth = 5
+        Me.AG_OutV.BaseArcRadius = 110
+        Me.AG_OutV.BaseArcWidth = 12
         Me.AG_OutV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_OutV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_OutV, "AG_OutV")
         Me.AG_OutV.MaxValue = 100
         Me.AG_OutV.MinValue = 0
         Me.AG_OutV.Name = "AG_OutV"
-        Me.AG_OutV.NeedleRadius = 32
-        Me.AG_OutV.ScaleLinesInterInnerRadius = 40
-        Me.AG_OutV.ScaleLinesInterOuterRadius = 48
-        Me.AG_OutV.ScaleLinesMajorInnerRadius = 40
-        Me.AG_OutV.ScaleLinesMajorOuterRadius = 48
-        Me.AG_OutV.ScaleLinesMinorInnerRadius = 42
-        Me.AG_OutV.ScaleLinesMinorOuterRadius = 48
+        Me.AG_OutV.NeedleRadius = 105
+        Me.AG_OutV.ScaleLinesInterInnerRadius = 105
+        Me.AG_OutV.ScaleLinesInterOuterRadius = 115
+        Me.AG_OutV.ScaleLinesMajorInnerRadius = 105
+        Me.AG_OutV.ScaleLinesMajorOuterRadius = 115
+        Me.AG_OutV.ScaleLinesMinorInnerRadius = 108
+        Me.AG_OutV.ScaleLinesMinorOuterRadius = 115
         Me.AG_OutV.ScaleNumbersFormat = Nothing
-        Me.AG_OutV.ScaleNumbersRadius = 60
+        Me.AG_OutV.ScaleNumbersRadius = 125
         Me.AG_OutV.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Volts
         Me.AG_OutV.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.None
         Me.AG_OutV.Value = 0!
@@ -470,23 +470,23 @@ Partial Class WinNUT
         '
         'AG_BattCh
         '
-        Me.AG_BattCh.BaseArcRadius = 45
-        Me.AG_BattCh.BaseArcWidth = 5
+        Me.AG_BattCh.BaseArcRadius = 110
+        Me.AG_BattCh.BaseArcWidth = 12
         Me.AG_BattCh.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.LeftToRight
         Me.AG_BattCh.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_BattCh, "AG_BattCh")
         Me.AG_BattCh.MaxValue = 100
         Me.AG_BattCh.MinValue = 0
         Me.AG_BattCh.Name = "AG_BattCh"
-        Me.AG_BattCh.NeedleRadius = 32
-        Me.AG_BattCh.ScaleLinesInterInnerRadius = 40
-        Me.AG_BattCh.ScaleLinesInterOuterRadius = 48
-        Me.AG_BattCh.ScaleLinesMajorInnerRadius = 40
-        Me.AG_BattCh.ScaleLinesMajorOuterRadius = 48
-        Me.AG_BattCh.ScaleLinesMinorInnerRadius = 42
-        Me.AG_BattCh.ScaleLinesMinorOuterRadius = 48
+        Me.AG_BattCh.NeedleRadius = 105
+        Me.AG_BattCh.ScaleLinesInterInnerRadius = 105
+        Me.AG_BattCh.ScaleLinesInterOuterRadius = 115
+        Me.AG_BattCh.ScaleLinesMajorInnerRadius = 105
+        Me.AG_BattCh.ScaleLinesMajorOuterRadius = 115
+        Me.AG_BattCh.ScaleLinesMinorInnerRadius = 108
+        Me.AG_BattCh.ScaleLinesMinorOuterRadius = 115
         Me.AG_BattCh.ScaleNumbersFormat = Nothing
-        Me.AG_BattCh.ScaleNumbersRadius = 60
+        Me.AG_BattCh.ScaleNumbersRadius = 125
         Me.AG_BattCh.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Percent
         Me.AG_BattCh.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.None
         Me.AG_BattCh.Value = 0!
@@ -503,23 +503,23 @@ Partial Class WinNUT
         '
         'AG_Load
         '
-        Me.AG_Load.BaseArcRadius = 45
-        Me.AG_Load.BaseArcWidth = 5
+        Me.AG_Load.BaseArcRadius = 110
+        Me.AG_Load.BaseArcWidth = 12
         Me.AG_Load.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.RightToLeft
         Me.AG_Load.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_Load, "AG_Load")
         Me.AG_Load.MaxValue = 100
         Me.AG_Load.MinValue = 0
         Me.AG_Load.Name = "AG_Load"
-        Me.AG_Load.NeedleRadius = 32
-        Me.AG_Load.ScaleLinesInterInnerRadius = 40
-        Me.AG_Load.ScaleLinesInterOuterRadius = 48
-        Me.AG_Load.ScaleLinesMajorInnerRadius = 40
-        Me.AG_Load.ScaleLinesMajorOuterRadius = 48
-        Me.AG_Load.ScaleLinesMinorInnerRadius = 42
-        Me.AG_Load.ScaleLinesMinorOuterRadius = 48
+        Me.AG_Load.NeedleRadius = 105
+        Me.AG_Load.ScaleLinesInterInnerRadius = 105
+        Me.AG_Load.ScaleLinesInterOuterRadius = 115
+        Me.AG_Load.ScaleLinesMajorInnerRadius = 105
+        Me.AG_Load.ScaleLinesMajorOuterRadius = 115
+        Me.AG_Load.ScaleLinesMinorInnerRadius = 108
+        Me.AG_Load.ScaleLinesMinorOuterRadius = 115
         Me.AG_Load.ScaleNumbersFormat = Nothing
-        Me.AG_Load.ScaleNumbersRadius = 60
+        Me.AG_Load.ScaleNumbersRadius = 125
         Me.AG_Load.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Percent
         Me.AG_Load.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Watts
         Me.AG_Load.Value = 0!
@@ -541,23 +541,23 @@ Partial Class WinNUT
         '
         'AG_BattV
         '
-        Me.AG_BattV.BaseArcRadius = 45
-        Me.AG_BattV.BaseArcWidth = 5
+        Me.AG_BattV.BaseArcRadius = 110
+        Me.AG_BattV.BaseArcWidth = 12
         Me.AG_BattV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_BattV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_BattV, "AG_BattV")
         Me.AG_BattV.MaxValue = 100
         Me.AG_BattV.MinValue = 0
         Me.AG_BattV.Name = "AG_BattV"
-        Me.AG_BattV.NeedleRadius = 32
-        Me.AG_BattV.ScaleLinesInterInnerRadius = 40
-        Me.AG_BattV.ScaleLinesInterOuterRadius = 48
-        Me.AG_BattV.ScaleLinesMajorInnerRadius = 40
-        Me.AG_BattV.ScaleLinesMajorOuterRadius = 48
-        Me.AG_BattV.ScaleLinesMinorInnerRadius = 42
-        Me.AG_BattV.ScaleLinesMinorOuterRadius = 48
+        Me.AG_BattV.NeedleRadius = 105
+        Me.AG_BattV.ScaleLinesInterInnerRadius = 105
+        Me.AG_BattV.ScaleLinesInterOuterRadius = 115
+        Me.AG_BattV.ScaleLinesMajorInnerRadius = 105
+        Me.AG_BattV.ScaleLinesMajorOuterRadius = 115
+        Me.AG_BattV.ScaleLinesMinorInnerRadius = 108
+        Me.AG_BattV.ScaleLinesMinorOuterRadius = 115
         Me.AG_BattV.ScaleNumbersFormat = Nothing
-        Me.AG_BattV.ScaleNumbersRadius = 60
+        Me.AG_BattV.ScaleNumbersRadius = 125
         Me.AG_BattV.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Volts
         Me.AG_BattV.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.None
         Me.AG_BattV.Value = 0!
@@ -579,23 +579,23 @@ Partial Class WinNUT
         '
         'AG_InF
         '
-        Me.AG_InF.BaseArcRadius = 45
-        Me.AG_InF.BaseArcWidth = 5
+        Me.AG_InF.BaseArcRadius = 110
+        Me.AG_InF.BaseArcWidth = 12
         Me.AG_InF.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_InF.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
         resources.ApplyResources(Me.AG_InF, "AG_InF")
         Me.AG_InF.MaxValue = 100
         Me.AG_InF.MinValue = 0
         Me.AG_InF.Name = "AG_InF"
-        Me.AG_InF.NeedleRadius = 32
-        Me.AG_InF.ScaleLinesInterInnerRadius = 40
-        Me.AG_InF.ScaleLinesInterOuterRadius = 48
-        Me.AG_InF.ScaleLinesMajorInnerRadius = 40
-        Me.AG_InF.ScaleLinesMajorOuterRadius = 48
-        Me.AG_InF.ScaleLinesMinorInnerRadius = 42
-        Me.AG_InF.ScaleLinesMinorOuterRadius = 48
+        Me.AG_InF.NeedleRadius = 105
+        Me.AG_InF.ScaleLinesInterInnerRadius = 105
+        Me.AG_InF.ScaleLinesInterOuterRadius = 115
+        Me.AG_InF.ScaleLinesMajorInnerRadius = 105
+        Me.AG_InF.ScaleLinesMajorOuterRadius = 115
+        Me.AG_InF.ScaleLinesMinorInnerRadius = 108
+        Me.AG_InF.ScaleLinesMinorOuterRadius = 115
         Me.AG_InF.ScaleNumbersFormat = Nothing
-        Me.AG_InF.ScaleNumbersRadius = 60
+        Me.AG_InF.ScaleNumbersRadius = 125
         Me.AG_InF.UnitValue1 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.Hertz
         Me.AG_InF.UnitValue2 = WinNUT_Client.Controls.UPSVarGauge.UnitValueEnum.None
         Me.AG_InF.Value = 0!
