@@ -303,7 +303,8 @@ Namespace Controls
                 ' Calculate center and scaling factor
                 Center = New Point(Me.Width \ 2, Me.Height \ 2)
                 Dim minSize As Integer = Math.Min(Me.Width, Me.Height)
-                centerFactor = If(minSize > 0, minSize / 200.0F, 1.0F)
+                ' Scale to fill 90% of the available space instead of using a fixed 200px reference
+                centerFactor = If(minSize > 0, (minSize * 0.9F) / 160.0F, 1.0F)
 
                 ' Render components
                 RenderDefaultArc(g)
