@@ -1,5 +1,5 @@
 ﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
-' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
+' Copyright (C) 2019-2024 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
 ' GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -11,7 +11,7 @@ Namespace Controls
 
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Class UPSVarGauge
-        Inherits AGaugeClassic.AGauge
+        Inherits CustomGauge
 
         'Control overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()>

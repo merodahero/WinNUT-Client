@@ -1,5 +1,5 @@
 ﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
-' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
+' Copyright (C) 2019-2024 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
 ' GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -9,12 +9,11 @@
 
 Imports System.ComponentModel
 Imports System.Drawing.Drawing2D
-Imports AGaugeClassic
 
 Namespace Controls
 
     Friend Class UPSVarGauge
-        Inherits AGauge
+        Inherits CustomGauge
 
 #Region "Private Fields"
 
@@ -49,9 +48,8 @@ Namespace Controls
         Private ReadOnly m_ScaleNumbersStepScaleLines = 1
         Private ReadOnly m_ScaleNumbersRotation As Integer
 
-        Private ReadOnly m_NeedleType As NeedleType
         Private ReadOnly m_NeedleRadius = 32
-        Private ReadOnly m_NeedleColor1 = AGaugeNeedleColor.Gray
+        Private ReadOnly m_NeedleColor1 = Color.Gray
         Private ReadOnly m_NeedleColor2 = Color.DimGray
         Private ReadOnly m_NeedleWidth = 2
 
@@ -70,7 +68,7 @@ Namespace Controls
                 Description("First value to display.")>
         Public Property Value1 As Single
             Get
-                Return Value
+                Return MyBase.Value
             End Get
             Set(value As Single)
                 MyBase.Value = value
@@ -87,8 +85,8 @@ Namespace Controls
             Set(value As Single)
                 If m_value2 <> value Then
                     m_value2 = value
-                    OnValueChanged(Me, Nothing)
-                    Refresh()
+                    OnValueChanged(Me, EventArgs.Empty)
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -102,7 +100,7 @@ Namespace Controls
             End Get
             Set(value As GradientTypeEnum)
                 m_gradientType = value
-                Refresh()
+                Me.Invalidate()
             End Set
         End Property
 
@@ -117,7 +115,7 @@ Namespace Controls
 
                 If m_gradientOrientation <> value Then
                     m_gradientOrientation = value
-                    Refresh()
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -133,7 +131,7 @@ Namespace Controls
 
                 If m_unitvalue1 <> value Then
                     m_unitvalue1 = value
-                    Refresh()
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -149,7 +147,7 @@ Namespace Controls
 
                 If m_unitvalue2 <> value Then
                     m_unitvalue2 = value
-                    Refresh()
+                    Me.Invalidate()
                 End If
             End Set
         End Property
@@ -179,13 +177,11 @@ Namespace Controls
         Public Sub New()
             MyBase.New()
             InitializeComponent()
-
-            Size = New Size(148, 130)
         End Sub
 
-        Overrides Sub RenderDefaultArc(graphics As Graphics)
+        Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
             If m_BaseArcRadius > 0 Then
-                Dim baseArcRadius As Integer = m_BaseArcRadius * centerFactor
+                Dim baseArcRadius As Integer = CInt(m_BaseArcRadius * centerFactor)
 
                 If m_gradientType = GradientTypeEnum.None Then
                     Using pnArc = New Pen(BaseArcColor, m_BaseArcWidth * centerFactor)
@@ -230,7 +226,7 @@ Namespace Controls
         ''' <summary>
         ''' Override PostRender and render the value of the gauge with unit.
         ''' </summary>
-        Overrides Sub PostRender(graphics As Graphics)
+        Protected Overrides Sub PostRender(graphics As Graphics)
             Dim PenString = New Pen(Color.Black)
             Dim PenFontV1 = New Font("Microsoft Sans Serif", 8, FontStyle.Bold)
             Dim PenFontV2 = New Font("Microsoft Sans Serif", 7, FontStyle.Bold)
