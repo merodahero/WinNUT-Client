@@ -187,11 +187,13 @@ Namespace Controls
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
             Try
                 ' Use the base class properties instead of local hardcoded values
-                If BaseArcRadius > 0 Then
+                If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
                     Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
+                    Dim scaledWidth As Single = BaseArcWidth * centerFactor
 
                     If m_gradientType = GradientTypeEnum.None Then
-                        Using pnArc = New Pen(BaseArcColor, BaseArcWidth * centerFactor)
+                        ' Render with solid color
+                        Using pnArc = New Pen(BaseArcColor, scaledWidth)
                             graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
                                                                       Center.Y - baseArcRadius,
                                                                       2 * baseArcRadius,
@@ -200,29 +202,32 @@ Namespace Controls
                         End Using
 
                     Else
+                        ' Render with gradient
                         Dim GradientP1Brush As Point
                         Dim GradientP2Brush As Point
-                        Dim scaledWidth As Integer = CInt(BaseArcWidth * centerFactor)
+                        Dim gradientMargin As Integer = CInt(scaledWidth) + 2
 
                         Select Case m_gradientOrientation
                             Case GradientOrientationEnum.TopToBottom
-                                GradientP1Brush = New Point(Center.X, Center.Y - baseArcRadius - scaledWidth - 2)
-                                GradientP2Brush = New Point(Center.X, Center.Y + baseArcRadius + scaledWidth + 2)
+                                GradientP1Brush = New Point(Center.X, Center.Y - baseArcRadius - gradientMargin)
+                                GradientP2Brush = New Point(Center.X, Center.Y + baseArcRadius + gradientMargin)
                             Case GradientOrientationEnum.BottomToTop
-                                GradientP1Brush = New Point(Center.X, Center.Y + baseArcRadius + scaledWidth + 2)
-                                GradientP2Brush = New Point(Center.X, Center.Y - baseArcRadius - scaledWidth - 2)
+                                GradientP1Brush = New Point(Center.X, Center.Y + baseArcRadius + gradientMargin)
+                                GradientP2Brush = New Point(Center.X, Center.Y - baseArcRadius - gradientMargin)
                             Case GradientOrientationEnum.RightToLeft
-                                GradientP1Brush = New Point(Center.X + baseArcRadius + scaledWidth + 2, Center.Y)
-                                GradientP2Brush = New Point(Center.X - baseArcRadius - scaledWidth - 2, Center.Y)
+                                GradientP1Brush = New Point(Center.X + baseArcRadius + gradientMargin, Center.Y)
+                                GradientP2Brush = New Point(Center.X - baseArcRadius - gradientMargin, Center.Y)
                             Case GradientOrientationEnum.LeftToRight
-                                GradientP1Brush = New Point(Center.X - baseArcRadius - scaledWidth - 2, Center.Y)
-                                GradientP2Brush = New Point(Center.X + baseArcRadius + scaledWidth + 2, Center.Y)
+                                GradientP1Brush = New Point(Center.X - baseArcRadius - gradientMargin, Center.Y)
+                                GradientP2Brush = New Point(Center.X + baseArcRadius + gradientMargin, Center.Y)
                         End Select
 
-                        ' Make sure points are not the same
-                        If GradientP1Brush <> GradientP2Brush Then
+                        ' Make sure we have valid points for the gradient brush
+                        If GradientP1Brush <> GradientP2Brush AndAlso 
+                           baseArcRadius > 0 AndAlso scaledWidth > 0 Then
+
                             Using myArc1Gradient = New LinearGradientBrush(GradientP1Brush, GradientP2Brush, Color.Red, Color.Green)
-                                Using pnArc = New Pen(myArc1Gradient, BaseArcWidth * centerFactor)
+                                Using pnArc = New Pen(myArc1Gradient, scaledWidth)
                                     graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
                                                                               Center.Y - baseArcRadius,
                                                                               2 * baseArcRadius,
@@ -230,12 +235,35 @@ Namespace Controls
                                                          135, 270)
                                 End Using
                             End Using
+                        Else
+                            ' Fallback to solid gray if gradient parameters are invalid
+                            Using pnArc = New Pen(Color.Gray, scaledWidth)
+                                graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
+                                                                          Center.Y - baseArcRadius,
+                                                                          2 * baseArcRadius,
+                                                                          2 * baseArcRadius),
+                                                     135, 270)
+                            End Using
                         End If
                     End If
                 End If
             Catch ex As Exception
-                ' Fallback: render with solid color if gradient fails
-                MyBase.RenderDefaultArc(graphics)
+                ' Fallback: render with solid color if anything fails
+                System.Diagnostics.Debug.WriteLine($"Gradient arc error: {ex.Message}")
+                Try
+                    If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
+                        Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
+                        Using pnArc = New Pen(Color.Gray, BaseArcWidth * centerFactor)
+                            graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
+                                                                      Center.Y - baseArcRadius,
+                                                                      2 * baseArcRadius,
+                                                                      2 * baseArcRadius),
+                                                 135, 270)
+                        End Using
+                    End If
+                Catch
+                    ' If even fallback fails, just skip rendering the arc
+                End Try
             End Try
         End Sub
 
