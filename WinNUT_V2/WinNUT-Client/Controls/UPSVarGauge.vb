@@ -185,49 +185,58 @@ Namespace Controls
         End Sub
 
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
-            ' Use the base class properties instead of local hardcoded values
-            If BaseArcRadius > 0 Then
-                Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
+            Try
+                ' Use the base class properties instead of local hardcoded values
+                If BaseArcRadius > 0 Then
+                    Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
 
-                If m_gradientType = GradientTypeEnum.None Then
-                    Using pnArc = New Pen(BaseArcColor, BaseArcWidth * centerFactor)
-                        graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
-                                                                  Center.Y - baseArcRadius,
-                                                                  2 * baseArcRadius,
-                                                                  2 * baseArcRadius),
-                                             135, 270)
-                    End Using
-
-                Else
-                    Dim GradientP1Brush As Point
-                    Dim GradientP2Brush As Point
-
-                    Select Case m_gradientOrientation
-                        Case GradientOrientationEnum.TopToBottom
-                            GradientP1Brush = New Point(0, CInt(Center.Y - baseArcRadius - BaseArcWidth - 2))
-                            GradientP2Brush = New Point(0, CInt(Center.Y + baseArcRadius + BaseArcWidth + 2))
-                        Case GradientOrientationEnum.BottomToTop
-                            GradientP1Brush = New Point(0, CInt(Center.Y + baseArcRadius + BaseArcWidth + 2))
-                            GradientP2Brush = New Point(0, CInt(Center.Y - baseArcRadius - BaseArcWidth - 2))
-                        Case GradientOrientationEnum.RightToLeft
-                            GradientP1Brush = New Point(CInt(Center.X + baseArcRadius + BaseArcWidth + 2), 0)
-                            GradientP2Brush = New Point(CInt(Center.X - baseArcRadius - BaseArcWidth - 2), 0)
-                        Case GradientOrientationEnum.LeftToRight
-                            GradientP1Brush = New Point(CInt(Center.X - baseArcRadius - BaseArcWidth - 2), 0)
-                            GradientP2Brush = New Point(CInt(Center.X + baseArcRadius + BaseArcWidth + 2), 0)
-                    End Select
-
-                    Using myArc1Gradient = New LinearGradientBrush(GradientP1Brush, GradientP2Brush, Color.Red, Color.Green)
-                        Using pnArc = New Pen(myArc1Gradient, BaseArcWidth * centerFactor)
+                    If m_gradientType = GradientTypeEnum.None Then
+                        Using pnArc = New Pen(BaseArcColor, BaseArcWidth * centerFactor)
                             graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
                                                                       Center.Y - baseArcRadius,
                                                                       2 * baseArcRadius,
                                                                       2 * baseArcRadius),
                                                  135, 270)
                         End Using
-                    End Using
+
+                    Else
+                        Dim GradientP1Brush As Point
+                        Dim GradientP2Brush As Point
+                        Dim scaledWidth As Integer = CInt(BaseArcWidth * centerFactor)
+
+                        Select Case m_gradientOrientation
+                            Case GradientOrientationEnum.TopToBottom
+                                GradientP1Brush = New Point(Center.X, Center.Y - baseArcRadius - scaledWidth - 2)
+                                GradientP2Brush = New Point(Center.X, Center.Y + baseArcRadius + scaledWidth + 2)
+                            Case GradientOrientationEnum.BottomToTop
+                                GradientP1Brush = New Point(Center.X, Center.Y + baseArcRadius + scaledWidth + 2)
+                                GradientP2Brush = New Point(Center.X, Center.Y - baseArcRadius - scaledWidth - 2)
+                            Case GradientOrientationEnum.RightToLeft
+                                GradientP1Brush = New Point(Center.X + baseArcRadius + scaledWidth + 2, Center.Y)
+                                GradientP2Brush = New Point(Center.X - baseArcRadius - scaledWidth - 2, Center.Y)
+                            Case GradientOrientationEnum.LeftToRight
+                                GradientP1Brush = New Point(Center.X - baseArcRadius - scaledWidth - 2, Center.Y)
+                                GradientP2Brush = New Point(Center.X + baseArcRadius + scaledWidth + 2, Center.Y)
+                        End Select
+
+                        ' Make sure points are not the same
+                        If GradientP1Brush <> GradientP2Brush Then
+                            Using myArc1Gradient = New LinearGradientBrush(GradientP1Brush, GradientP2Brush, Color.Red, Color.Green)
+                                Using pnArc = New Pen(myArc1Gradient, BaseArcWidth * centerFactor)
+                                    graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
+                                                                              Center.Y - baseArcRadius,
+                                                                              2 * baseArcRadius,
+                                                                              2 * baseArcRadius),
+                                                         135, 270)
+                                End Using
+                            End Using
+                        End If
+                    End If
                 End If
-            End If
+            Catch ex As Exception
+                ' Fallback: render with solid color if gradient fails
+                MyBase.RenderDefaultArc(graphics)
+            End Try
         End Sub
 
         ''' <summary>
