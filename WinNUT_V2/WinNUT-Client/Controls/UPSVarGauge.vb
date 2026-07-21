@@ -176,7 +176,12 @@ Namespace Controls
 
         Public Sub New()
             MyBase.New()
-            InitializeComponent()
+            ' Initialize component if it exists, but don't fail if it doesn't
+            Try
+                InitializeComponent()
+            Catch ex As Exception
+                ' Designer component initialization is optional for this control
+            End Try
         End Sub
 
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
@@ -252,8 +257,8 @@ Namespace Controls
             End If
         End Sub
 
-        Private Function ApplyUnit(value As String, unit As UnitValueEnum)
-            Dim returnStr = value
+        Private Function ApplyUnit(value As Single, unit As UnitValueEnum) As String
+            Dim returnStr = value.ToString("F1")
 
             Select Case unit
                 Case UnitValueEnum.Hertz

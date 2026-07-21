@@ -285,23 +285,31 @@ Namespace Controls
 #Region "Painting"
 
         Protected Overrides Sub OnPaint(e As PaintEventArgs)
-            MyBase.OnPaint(e)
+            Try
+                MyBase.OnPaint(e)
 
-            Dim g As Graphics = e.Graphics
-            g.SmoothingMode = SmoothingMode.AntiAlias
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality
+                ' Don't paint if control is too small
+                If Me.Width < 10 OrElse Me.Height < 10 Then Return
 
-            ' Calculate center and scaling factor
-            Center = New Point(Me.Width \ 2, Me.Height \ 2)
-            Dim minSize As Integer = Math.Min(Me.Width, Me.Height)
-            centerFactor = minSize / 200.0F
+                Dim g As Graphics = e.Graphics
+                g.SmoothingMode = SmoothingMode.AntiAlias
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality
 
-            ' Render components
-            RenderDefaultArc(g)
-            RenderScaleLines(g)
-            RenderScaleNumbers(g)
-            RenderNeedle(g)
-            PostRender(g)
+                ' Calculate center and scaling factor
+                Center = New Point(Me.Width \ 2, Me.Height \ 2)
+                Dim minSize As Integer = Math.Min(Me.Width, Me.Height)
+                centerFactor = If(minSize > 0, minSize / 200.0F, 1.0F)
+
+                ' Render components
+                RenderDefaultArc(g)
+                RenderScaleLines(g)
+                RenderScaleNumbers(g)
+                RenderNeedle(g)
+                PostRender(g)
+            Catch ex As Exception
+                ' Prevent paint exceptions from crashing the app
+                System.Diagnostics.Debug.WriteLine($"Gauge paint error: {ex.Message}")
+            End Try
         End Sub
 
         Protected Overridable Sub RenderDefaultArc(g As Graphics)
@@ -316,32 +324,38 @@ Namespace Controls
         End Sub
 
         Protected Overridable Sub RenderScaleLines(g As Graphics)
+            If _scaleLinesMajorStepValue <= 0 OrElse _maxValue <= _minValue Then Return
+
             Dim startAngle As Single = _baseArcStart
             Dim sweepAngle As Single = _baseArcSweep
             Dim valueRange As Single = _maxValue - _minValue
             Dim anglePerValue As Single = sweepAngle / valueRange
 
             ' Draw major scale lines
-            If _scaleLinesMajorStepValue > 0 Then
-                Dim currentValue As Single = _minValue
-                While currentValue <= _maxValue
-                    Dim angle As Single = startAngle + (currentValue - _minValue) * anglePerValue
-                    DrawScaleLine(g, angle, _scaleLinesMajorInnerRadius, _scaleLinesMajorOuterRadius, 2)
-                    currentValue += _scaleLinesMajorStepValue
-                End While
-            End If
+            Dim currentValue As Single = _minValue
+            Dim safetyCounter As Integer = 0
+            While currentValue <= _maxValue AndAlso safetyCounter < 1000
+                Dim angle As Single = startAngle + (currentValue - _minValue) * anglePerValue
+                DrawScaleLine(g, angle, _scaleLinesMajorInnerRadius, _scaleLinesMajorOuterRadius, 2)
+                currentValue += _scaleLinesMajorStepValue
+                safetyCounter += 1
+            End While
 
             ' Draw minor scale lines
-            If _scaleLinesMinorNumOf > 0 AndAlso _scaleLinesMajorStepValue > 0 Then
+            If _scaleLinesMinorNumOf > 0 Then
                 Dim minorStep As Single = _scaleLinesMajorStepValue / (_scaleLinesMinorNumOf + 1)
-                Dim currentValue As Single = _minValue + minorStep
-                While currentValue < _maxValue
-                    If Math.Abs(currentValue Mod _scaleLinesMajorStepValue) > 0.001 Then
-                        Dim angle As Single = startAngle + (currentValue - _minValue) * anglePerValue
-                        DrawScaleLine(g, angle, _scaleLinesMinorInnerRadius, _scaleLinesMinorOuterRadius, 1)
-                    End If
-                    currentValue += minorStep
-                End While
+                If minorStep > 0 Then
+                    currentValue = _minValue + minorStep
+                    safetyCounter = 0
+                    While currentValue < _maxValue AndAlso safetyCounter < 1000
+                        If Math.Abs(currentValue Mod _scaleLinesMajorStepValue) > 0.001 Then
+                            Dim angle As Single = startAngle + (currentValue - _minValue) * anglePerValue
+                            DrawScaleLine(g, angle, _scaleLinesMinorInnerRadius, _scaleLinesMinorOuterRadius, 1)
+                        End If
+                        currentValue += minorStep
+                        safetyCounter += 1
+                    End While
+                End If
             End If
         End Sub
 
@@ -364,17 +378,18 @@ Namespace Controls
         End Sub
 
         Protected Overridable Sub RenderScaleNumbers(g As Graphics)
-            If _scaleLinesMajorStepValue <= 0 Then Return
+            If _scaleLinesMajorStepValue <= 0 OrElse _maxValue <= _minValue Then Return
 
             Dim startAngle As Single = _baseArcStart
             Dim sweepAngle As Single = _baseArcSweep
             Dim valueRange As Single = _maxValue - _minValue
             Dim anglePerValue As Single = sweepAngle / valueRange
 
-            Using font As New Font("Arial", 8 * centerFactor, FontStyle.Bold)
+            Using font As New Font("Arial", Math.Max(1, 8 * centerFactor), FontStyle.Bold)
                 Using brush As New SolidBrush(Color.Black)
                     Dim currentValue As Single = _minValue
-                    While currentValue <= _maxValue
+                    Dim safetyCounter As Integer = 0
+                    While currentValue <= _maxValue AndAlso safetyCounter < 100
                         Dim angle As Single = startAngle + (currentValue - _minValue) * anglePerValue
                         Dim angleRad As Double = angle * Math.PI / 180.0
                         Dim radius As Single = _scaleNumbersRadius * centerFactor
@@ -390,12 +405,15 @@ Namespace Controls
 
                         g.DrawString(text, font, brush, textPos)
                         currentValue += _scaleLinesMajorStepValue
+                        safetyCounter += 1
                     End While
                 End Using
             End Using
         End Sub
 
         Protected Overridable Sub RenderNeedle(g As Graphics)
+            If _maxValue <= _minValue Then Return
+
             Dim startAngle As Single = _baseArcStart
             Dim sweepAngle As Single = _baseArcSweep
             Dim valueRange As Single = _maxValue - _minValue
@@ -408,13 +426,13 @@ Namespace Controls
                 Center.X + CSng(Math.Cos(angleRad) * needleR),
                 Center.Y + CSng(Math.Sin(angleRad) * needleR))
 
-            Using pen As New Pen(_needleColor1, _needleWidth * centerFactor)
+            Using pen As New Pen(_needleColor1, Math.Max(1, _needleWidth * centerFactor))
                 pen.EndCap = LineCap.ArrowAnchor
                 g.DrawLine(pen, Center, needleEnd)
             End Using
 
             ' Draw center circle
-            Dim circleRadius As Single = 4 * centerFactor
+            Dim circleRadius As Single = Math.Max(1, 4 * centerFactor)
             Using brush As New SolidBrush(_needleColor2)
                 g.FillEllipse(brush, Center.X - circleRadius, Center.Y - circleRadius,
                              2 * circleRadius, 2 * circleRadius)
