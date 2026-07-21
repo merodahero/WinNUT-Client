@@ -50,19 +50,14 @@ public sealed class NutClient : IAsyncDisposable
         {
             response = await SendAsync($"GET VAR {upsName} {variable}", cancellationToken);
         }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("VAR-NOT-SUPPORTED", StringComparison.OrdinalIgnoreCase))
+        catch (Exception ex) when (NutProtocol.IsUnsupportedVariableError(ex))
         {
             // NUT servers are allowed to omit variables. The dashboard should
             // simply leave that metric unavailable rather than aborting a poll.
             return null;
         }
         // A GET VAR response is: VAR <ups-name> <variable-name> <quoted value>.
-        // Limit the split so values containing spaces remain intact.
-        var tokens = response.Split(' ', 4, StringSplitOptions.RemoveEmptyEntries);
-        if (tokens.Length < 4 || !string.Equals(tokens[0], "VAR", StringComparison.Ordinal))
-            return null;
-
-        return tokens[3].Trim('"');
+        return NutProtocol.TryParseVariable(response, out _, out var value) ? value : null;
     }
 
     public async Task<IReadOnlyDictionary<string, string>> GetVariablesAsync(string upsName, IEnumerable<string> variables, CancellationToken cancellationToken = default)
@@ -97,8 +92,7 @@ public sealed class NutClient : IAsyncDisposable
                 if (response.StartsWith("END LIST VAR", StringComparison.Ordinal)) break;
                 if (!response.StartsWith("VAR ", StringComparison.Ordinal)) continue;
 
-                var tokens = response.Split(' ', 4, StringSplitOptions.RemoveEmptyEntries);
-                if (tokens.Length == 4) values[tokens[2]] = tokens[3].Trim('"');
+                if (NutProtocol.TryParseVariable(response, out var variable, out var value)) values[variable] = value;
             }
         }
         finally

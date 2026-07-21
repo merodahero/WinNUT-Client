@@ -21,11 +21,13 @@ public partial class MainWindow : Window
     private readonly AppearanceSettings _appearanceSettings;
     private readonly NutClient _nutClient = new();
     private readonly DispatcherTimer _pollTimer;
+    private readonly DispatcherTimer _reconnectTimer;
     private readonly Queue<string> _recentEvents = new();
     private readonly HashSet<string> _activeAlerts = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _alertMessages = new(StringComparer.Ordinal);
     private IReadOnlyDictionary<string, string> _listedNutVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private bool _isRefreshing;
+    private bool _isConnecting;
     private string? _lastStatus;
     private DateTime? _shutdownDueAt;
     private bool _shutdownTriggered;
@@ -36,6 +38,8 @@ public partial class MainWindow : Window
         _appearanceSettings = AppearanceSettings.Load();
         _pollTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _pollTimer.Tick += PollTimer_OnTick;
+        _reconnectTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        _reconnectTimer.Tick += ReconnectTimer_OnTick;
         InitializeComponent();
         Opened += MainWindow_OnOpened;
         Closing += MainWindow_OnClosing;
@@ -211,6 +215,8 @@ public partial class MainWindow : Window
 
     private async System.Threading.Tasks.Task ConnectAsync(bool startup = false)
     {
+        if (_isConnecting) return;
+        _isConnecting = true;
         var state = this.FindControl<TextBlock>("ConnectionState")!;
         var host = this.FindControl<TextBox>("HostText")!.Text?.Trim() ?? string.Empty;
         var upsName = this.FindControl<TextBox>("UpsNameText")!.Text?.Trim() ?? string.Empty;
@@ -219,6 +225,7 @@ public partial class MainWindow : Window
         if (!int.TryParse(this.FindControl<TextBox>("PortText")!.Text, out var port) || string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(upsName))
         {
             state.Text = "Host, port, and UPS name are required.";
+            _isConnecting = false;
             return;
         }
 
@@ -227,6 +234,7 @@ public partial class MainWindow : Window
             state.Text = "Connecting…";
             await _nutClient.ConnectAsync(host, port);
             await _nutClient.LoginAsync(upsName, username, password);
+            _reconnectTimer.Stop();
             _appearanceSettings.Host = host;
             _appearanceSettings.Port = port;
             _appearanceSettings.UpsName = upsName;
@@ -249,7 +257,23 @@ public partial class MainWindow : Window
             ResetDashboard();
             SetAlert("connection", true, "Connection to the NUT server failed");
             state.Text = startup ? $"Reconnect failed: {ex.Message}" : $"Connection failed: {ex.Message}";
+            if (_appearanceSettings.AutoReconnect) _reconnectTimer.Start();
         }
+        finally
+        {
+            _isConnecting = false;
+        }
+    }
+
+    private async void ReconnectTimer_OnTick(object? sender, EventArgs e)
+    {
+        if (_nutClient.IsConnected)
+        {
+            _reconnectTimer.Stop();
+            return;
+        }
+
+        await ConnectAsync(startup: true);
     }
 
     private async void RefreshButton_OnClick(object? sender, RoutedEventArgs e)
@@ -360,7 +384,7 @@ public partial class MainWindow : Window
             ResetDashboard("Connection lost");
             SetAlert("connection", true, "Connection to the NUT server was lost");
             if (_appearanceSettings.AutoReconnect)
-                await ConnectAsync(startup: true);
+                _reconnectTimer.Start();
         }
         finally
         {
@@ -391,18 +415,8 @@ public partial class MainWindow : Window
     private static (double Value, string Source)? ResolvePowerFactor(
         IReadOnlyDictionary<string, string> values, string directVariable, string realPowerVariable, string apparentPowerVariable)
     {
-        if (TryGetNumber(values, directVariable, out var reported) && reported > 0 && reported <= 1)
-            return (reported, "NUT reported");
-
-        if (TryGetNumber(values, realPowerVariable, out var realPower) &&
-            TryGetNumber(values, apparentPowerVariable, out var apparentPower) && apparentPower > 0)
-        {
-            var calculated = realPower / apparentPower;
-            if (calculated > 0 && calculated <= 1)
-                return (calculated, "Calculated (W ÷ VA)");
-        }
-
-        return null;
+        var result = PowerCalculations.ResolvePowerFactor(values, directVariable, realPowerVariable, apparentPowerVariable);
+        return result is null ? null : (result.Value.Value, result.Value.Source);
     }
 
     private static string FormatUpsIdentity(IReadOnlyDictionary<string, string> values)
@@ -798,71 +812,13 @@ public partial class MainWindow : Window
 
     private (double Watts, string Source, string Detail)? CalculateOutputPower(IReadOnlyDictionary<string, string> values)
     {
-        if (TryGetNumber(values, "output.realpower", out var outputRealPower))
-            return (outputRealPower, "Measured output", "NUT reported output.realpower");
-
-        var outputPowerFactor = ResolvePowerFactor(values, "output.powerfactor", "output.realpower", "output.power");
-        if (TryGetNumber(values, "output.power", out var outputApparentPower) && outputPowerFactor is not null)
-            return (outputApparentPower * outputPowerFactor.Value.Value,
-                $"Estimated from output VA ({outputPowerFactor.Value.Source})",
-                $"{outputApparentPower:0} VA × PF {outputPowerFactor.Value.Value:0.00} = {outputApparentPower * outputPowerFactor.Value.Value:0} W");
-
-        if (TryGetNumber(values, "ups.realpower", out var upsRealPower))
-            return (upsRealPower, "Measured UPS real power", "NUT reported ups.realpower");
-
-        if (TryGetNumber(values, "output.current", out var outputCurrent) &&
-            TryGetNumber(values, "output.voltage", out var outputVoltage))
-        {
-            var powerFactor = outputPowerFactor ??
-                (_appearanceSettings.OutputLoadPowerFactor, $"Configured PF {_appearanceSettings.OutputLoadPowerFactor:0.00}");
-            return (outputCurrent * outputVoltage * powerFactor.Value,
-                $"Calculated from output V × A ({powerFactor.Source})",
-                $"{outputVoltage:0.0} V × {outputCurrent:0.00} A × PF {powerFactor.Value:0.00} = {outputCurrent * outputVoltage * powerFactor.Value:0} W");
-        }
-
-        if (TryGetNumber(values, "ups.load", out var load))
-        {
-            if (TryGetFirstNumber(values, out var nominalRealPower,
-                    "ups.realpower.nominal", "output.realpower.nominal"))
-                return (nominalRealPower * load / 100d, "Estimated from NUT nominal real power",
-                    $"{nominalRealPower:0} W nominal × {load:0.#}% = {nominalRealPower * load / 100d:0} W");
-
-            if (TryGetFirstNumber(values, out var nominalApparentPower,
-                    "ups.power.nominal", "output.power.nominal"))
-                return (nominalApparentPower * _appearanceSettings.RatedOutputPowerFactor * load / 100d,
-                    $"Estimated from NUT nominal VA (rated PF {_appearanceSettings.RatedOutputPowerFactor:0.00})",
-                    $"{nominalApparentPower:0} VA × PF {_appearanceSettings.RatedOutputPowerFactor:0.00} × {load:0.#}% = {nominalApparentPower * _appearanceSettings.RatedOutputPowerFactor * load / 100d:0} W");
-
-            if (_appearanceSettings.NominalOutputPowerWatts > 0)
-                return (_appearanceSettings.NominalOutputPowerWatts * load / 100d,
-                    $"Estimated from configured {_appearanceSettings.NominalOutputPowerWatts:N0} W rating",
-                    $"{_appearanceSettings.NominalOutputPowerWatts:N0} W nominal × {load:0.#}% = {_appearanceSettings.NominalOutputPowerWatts * load / 100d:0} W");
-
-            return (_appearanceSettings.NominalOutputPowerVa * _appearanceSettings.RatedOutputPowerFactor * load / 100d,
-                $"Estimated from configured {_appearanceSettings.NominalOutputPowerVa:N0} VA (rated PF {_appearanceSettings.RatedOutputPowerFactor:0.00})",
-                $"{_appearanceSettings.NominalOutputPowerVa:N0} VA × PF {_appearanceSettings.RatedOutputPowerFactor:0.00} × {load:0.#}% = {_appearanceSettings.NominalOutputPowerVa * _appearanceSettings.RatedOutputPowerFactor * load / 100d:0} W");
-        }
-
-        return null;
-    }
-
-    private static bool TryGetFirstNumber(IReadOnlyDictionary<string, string> values, out double value, params string[] variables)
-    {
-        foreach (var variable in variables)
-        {
-            if (TryGetNumber(values, variable, out value))
-                return true;
-        }
-
-        value = default;
-        return false;
-    }
-
-    private static bool TryGetNumber(IReadOnlyDictionary<string, string> values, string variable, out double value)
-    {
-        value = default;
-        return values.TryGetValue(variable, out var text) &&
-               double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        var settings = new PowerCalculationSettings(
+            _appearanceSettings.OutputLoadPowerFactor,
+            _appearanceSettings.NominalOutputPowerWatts,
+            _appearanceSettings.NominalOutputPowerVa,
+            _appearanceSettings.RatedOutputPowerFactor);
+        var result = PowerCalculations.CalculateOutputPower(values, settings);
+        return result is null ? null : (result.Value.Watts, result.Value.Source, result.Value.Detail);
     }
 
     private static string FormatStatus(string? status)

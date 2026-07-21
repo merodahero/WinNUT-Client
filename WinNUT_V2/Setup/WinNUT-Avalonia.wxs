@@ -1,0 +1,31 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="WinNUT Monitor" Manufacturer="WinNUT" Version="3.0.0.0" UpgradeCode="C9981749-7B9A-4D92-8BE5-9B0A1788BC6F" Language="1033" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WinNUT Monitor is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="WinNUT Monitor">
+        <Component Id="MainExecutable" Guid="93DA15BF-3C8D-45D0-974B-CE2F1A6B0D7D" Bitness="always64">
+          <File Id="WinNUTMonitorExe" Source="$(var.WinNUTPublishDir)\WinNUT-Monitor.exe" KeyPath="yes" />
+          <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
+          <RegistryValue Root="HKLM" Key="Software\WinNUT\Monitor" Name="Installed" Type="integer" Value="1" KeyPath="no" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="WinNUTProgramMenuFolder" Name="WinNUT Monitor">
+        <Component Id="StartMenuShortcut" Guid="3D8CD19D-A57C-4B7A-A08B-00E7B40F86D9">
+          <Shortcut Id="WinNUTStartMenuShortcut" Name="WinNUT Monitor" Target="[#WinNUTMonitorExe]" WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="RemoveProgramMenuFolder" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="Software\WinNUT\Monitor" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="WinNUT Monitor" Level="1">
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+  </Package>
+</Wix>

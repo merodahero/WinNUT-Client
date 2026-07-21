@@ -1,4 +1,11 @@
 ## History:
+### Unreleased — Avalonia desktop preview
+* Added the Avalonia monitoring UI with Windows light, dark, and system-theme modes.
+* Added resilient NUT monitoring, diagnostics, automatic reconnects, and status-aware alerts.
+* Added explicit reported/calculated labels for power factor and real-power estimates.
+* Added a self-contained .NET 10 Windows x64 publish profile and release metadata.
+* Added a Windows x64 MSI build for the Avalonia app, with install/uninstall coverage.
+
 ### Pre-Release v2.2.8436
 After a longer than expected wait, the next pre-release is out with another set of bugfixes.
 

@@ -1,14 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\WinNUT-Client\Resources\WinNut.ico</ApplicationIcon>
+    <AssemblyName>WinNUT-Monitor</AssemblyName>
+    <Product>WinNUT Monitor</Product>
+    <Company>WinNUT</Company>
+    <Description>Network UPS Tools desktop monitor</Description>
+    <Version>3.0.0-preview.1</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="..\WinNUT-Client\Resources\WinNut.ico" Link="Assets\WinNut.ico" />
   </ItemGroup>
 
   <ItemGroup>

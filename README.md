@@ -4,6 +4,26 @@ WinNUT is a WinForms client for connecting to a Network UPS Tools monitoring ser
 - 🌩️ Receive notifications for abnormal power conditions (power outage)
 - ❤️ Keep your hardware and data safe with configurable suspend and shutdown triggers
 
+## Avalonia desktop preview
+
+`WinNUT-Avalonia` is the current Windows desktop UI. It targets .NET 10 and is designed to keep all UPS readings honest: a NUT value is labelled as reported, a derived value shows its calculation, and unavailable readings are displayed as `—` rather than invented placeholders.
+
+For end users, publish the app as a self-contained Windows executable; no .NET runtime is required:
+
+```powershell
+dotnet publish WinNUT_V2\WinNUT-Avalonia\WinNUT-Avalonia.csproj -c Release -p:PublishProfile=win-x64-self-contained
+```
+
+The executable is written to `WinNUT_V2\WinNUT-Avalonia\bin\Publish\win-x64\`. For development, use Visual Studio 2026 (18.0+) with the .NET desktop workload, or the .NET 10 SDK.
+
+To produce the matching Windows x64 MSI, run:
+
+```powershell
+.\WinNUT_V2\Setup\build-avalonia-installer.ps1
+```
+
+The installer is written to `WinNUT_V2\Setup\bin\x64\Release\WinNUT-Avalonia.Setup.msi`. It installs the self-contained app under Program Files and adds a Start Menu shortcut. The legacy `Setup.vdproj` remains untouched for the original WinForms client.
+
 <br />
 <br />
 

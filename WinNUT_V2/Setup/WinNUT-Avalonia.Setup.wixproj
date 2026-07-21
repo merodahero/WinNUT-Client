@@ -1,0 +1,9 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\WinNUT-Avalonia\bin\Publish\win-x64</PublishDir>
+    <DefineConstants>WinNUTPublishDir=$(PublishDir)</DefineConstants>
+  </PropertyGroup>
+</Project>

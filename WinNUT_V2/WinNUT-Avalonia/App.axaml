@@ -14,7 +14,7 @@
     </Application.Styles>
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico" ToolTipText="WinNUT Monitor">
+            <TrayIcon Icon="/Assets/WinNut.ico" ToolTipText="WinNUT Monitor">
                 <TrayIcon.Menu>
                     <NativeMenu>
                         <NativeMenuItem Header="Show WinNUT" Click="TrayShow_OnClick" />
