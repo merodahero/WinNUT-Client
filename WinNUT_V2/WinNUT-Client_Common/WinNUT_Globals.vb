@@ -5,7 +5,7 @@ Public Module WinNUT_Globals
 #Region "Constants/Shareds"
 
     Private Const PARAM_PERSIST_DATA_IN_STARTUP_PATH = "-PersistDataInStartupPath"
-    Private ReadOnly PREFERRED_DATA_DIRECTORY = Windows.Forms.Application.LocalUserAppDataPath
+    Private ReadOnly PREFERRED_DATA_DIRECTORY = Application.LocalUserAppDataPath
 
     Public ReadOnly ProgramName As String = My.Application.Info.ProductName
     Public ReadOnly ProgramVersion As String = My.Application.Info.Version.ToString()
@@ -25,9 +25,9 @@ Public Module WinNUT_Globals
         If Environment.GetCommandLineArgs().Contains(PARAM_PERSIST_DATA_IN_STARTUP_PATH) Then
             LogFile.LogTracing("Detected CommandLineArg to store persistent data to StartupPath.", LogLvl.LOG_DEBUG, Nothing)
 
-            If IsPathWritable(Windows.Forms.Application.StartupPath) Then
+            If IsPathWritable(Application.StartupPath) Then
                 LogFile.LogTracing("Confirmed StartupPath as chosen path.", LogLvl.LOG_DEBUG, Nothing)
-                DataDirectory = Windows.Forms.Application.StartupPath
+                DataDirectory = Application.StartupPath
                 Return
             Else
                 LogFile.LogTracing("Log to StartupPath requested, but path is not writable.", LogLvl.LOG_ERROR, Nothing)
