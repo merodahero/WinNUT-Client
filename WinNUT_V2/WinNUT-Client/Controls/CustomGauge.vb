@@ -177,7 +177,7 @@ Namespace Controls
                 Return _scaleNumbersFormat
             End Get
             Set(val As String)
-                _scaleNumbersFormat = val
+                _scaleNumbersFormat = If(String.IsNullOrEmpty(val), "{0:F0}", val)
                 Invalidate()
             End Set
         End Property
@@ -278,6 +278,11 @@ Namespace Controls
             Me.ResizeRedraw = True
             Me.Size = New Size(200, 200)
             Me.BackColor = Color.Transparent
+
+            ' Set default scale number format if not set
+            If String.IsNullOrEmpty(_scaleNumbersFormat) Then
+                _scaleNumbersFormat = "{0:F0}"
+            End If
         End Sub
 
 #End Region
@@ -385,6 +390,9 @@ Namespace Controls
             Dim valueRange As Single = _maxValue - _minValue
             Dim anglePerValue As Single = sweepAngle / valueRange
 
+            ' Ensure we have a valid format string
+            Dim formatString As String = If(String.IsNullOrEmpty(_scaleNumbersFormat), "{0:F0}", _scaleNumbersFormat)
+
             Using font As New Font("Arial", Math.Max(1, 8 * centerFactor), FontStyle.Bold)
                 Using brush As New SolidBrush(Color.Black)
                     Dim currentValue As Single = _minValue
@@ -398,7 +406,7 @@ Namespace Controls
                             Center.X + CSng(Math.Cos(angleRad) * radius),
                             Center.Y + CSng(Math.Sin(angleRad) * radius))
 
-                        Dim text As String = String.Format(_scaleNumbersFormat, currentValue)
+                        Dim text As String = String.Format(formatString, currentValue)
                         Dim textSize As SizeF = g.MeasureString(text, font)
                         textPos.X -= textSize.Width / 2
                         textPos.Y -= textSize.Height / 2
