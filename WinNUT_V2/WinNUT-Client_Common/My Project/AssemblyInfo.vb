@@ -10,15 +10,6 @@
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
-' Les informations générales relatives à un assembly dépendent de
-' l'ensemble d'attributs suivant. Pour modifier les informations
-' associées à un assembly.
-
-' Vérifiez les valeurs des attributs de l'assembly
-
-<Assembly: AssemblyTitle("WinNUT-Client_Common")>
-<Assembly: AssemblyDescription("WinNUT-Client Common Library")>
-
 <Assembly: ComVisible(False)>
 
 'Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM

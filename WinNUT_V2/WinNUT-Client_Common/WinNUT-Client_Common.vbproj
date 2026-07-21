@@ -8,6 +8,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Configurations>Debug;PreRelease;Release</Configurations>
+    <AssemblyTitle>WinNUT-Client_Common</AssemblyTitle>
+    <Description>WinNUT-Client Common Library</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DocumentationFile>
