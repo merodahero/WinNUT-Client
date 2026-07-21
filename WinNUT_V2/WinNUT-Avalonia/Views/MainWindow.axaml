@@ -1,0 +1,216 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WinNUT_Avalonia.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
+        x:Class="WinNUT_Avalonia.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="WinNUT Monitor"
+        Width="1280" Height="820" MinWidth="980" MinHeight="650">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
+        <Border Padding="24,14" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                    <TextBlock Text="WinNUT Monitor" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Border Grid.Column="1" Margin="18,0" Padding="10,4" Background="#163B2B" CornerRadius="12">
+                    <TextBlock x:Name="HeaderConnectionText" Text="●  DISCONNECTED" Foreground="#B6BBC6" FontWeight="SemiBold" />
+                </Border>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="26">
+                    <Button Content="▣  Overview" Click="OverviewButton_OnClick" Background="Transparent" BorderThickness="0" Padding="0" FontWeight="SemiBold" Foreground="#3B9EFF" />
+                    <TextBlock Text="UPS" Opacity="0.7" />
+                    <Button Content="⌁  NUT" Click="NutNavigationButton_OnClick" Background="Transparent" BorderThickness="0" Padding="0" Opacity="0.7" />
+                    <Button Content="◷  Events" Click="EventsNavigationButton_OnClick" Background="Transparent" BorderThickness="0" Padding="0" Opacity="0.7" />
+                </StackPanel>
+                <Button Grid.Column="3" Content="⚙  Settings" Click="SettingsButton_OnClick" Background="Transparent" BorderThickness="0" Padding="0" Opacity="0.7" />
+            </Grid>
+        </Border>
+
+        <Border x:Name="AlertBanner" Grid.Row="1" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,14,0,0" Padding="14,8" CornerRadius="8" Background="#5C3216" ZIndex="2">
+            <TextBlock x:Name="AlertBannerText" Text="Alert" Foreground="#FFD58A" FontWeight="SemiBold" />
+        </Border>
+
+        <Grid x:Name="DashboardContent" Grid.Row="1" Margin="24" ColumnDefinitions="*,250" RowDefinitions="*,Auto" ColumnSpacing="20" RowSpacing="18">
+            <Border Padding="26" CornerRadius="14" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Power flow" FontSize="26" FontWeight="SemiBold" />
+                        <TextBlock Text="Live" Foreground="#6EE7A0" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0,28" ColumnDefinitions="*,*,*" ColumnSpacing="34" VerticalAlignment="Center">
+                        <Border Padding="20" CornerRadius="12" Background="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="UTILITY GRID" Opacity="0.7" />
+                                <TextBlock x:Name="InputVoltageText" Text="—" FontSize="28" FontWeight="SemiBold" />
+                                <TextBlock x:Name="InputFrequencyText" Text="—" Opacity="0.7" />
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                            <Border Width="170" Height="170" CornerRadius="85" Background="#123D32" BorderBrush="#46DC86" BorderThickness="2">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="UpsNameDisplayText" Text="UPS" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" />
+                                    <TextBlock x:Name="FlowStatusText" Text="DISCONNECTED" Foreground="#B6BBC6" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <TextBlock x:Name="UpsIdentityText" Text="—" Opacity="0.65" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="220" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="12" VerticalAlignment="Center">
+                            <Border Padding="16" CornerRadius="12" Background="{DynamicResource SystemControlBackgroundBaseMediumBrush}"><StackPanel><TextBlock Text="OUTPUT VOLTAGE" Opacity="0.65" /><TextBlock x:Name="FlowOutputVoltageText" Text="—" FontSize="18" /></StackPanel></Border>
+                            <Border Padding="16" CornerRadius="12" Background="{DynamicResource SystemControlBackgroundBaseMediumBrush}"><StackPanel><TextBlock Text="OUTPUT CURRENT" Opacity="0.65" /><TextBlock x:Name="OutputCurrentText" Text="—" FontSize="18" /></StackPanel></Border>
+                            <Border Padding="16" CornerRadius="12" Background="{DynamicResource SystemControlBackgroundBaseMediumBrush}"><StackPanel><TextBlock Text="PROTECTED LOAD" Opacity="0.65" /><TextBlock x:Name="FlowLoadText" Text="—" FontSize="18" /></StackPanel></Border>
+                        </StackPanel>
+                    </Grid>
+                    <Border Grid.Row="2" Padding="18" CornerRadius="12" Background="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
+                        <StackPanel Spacing="10"><TextBlock Text="Recent events" FontWeight="SemiBold" /><TextBlock x:Name="RecentEventsText" Text="Connect to a UPS to view live events." Opacity="0.75" TextWrapping="Wrap" /></StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Padding="22" CornerRadius="14" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                <StackPanel Spacing="14">
+                    <StackPanel><TextBlock Text="STATUS" Opacity="0.65" /><TextBlock x:Name="StatusText" Text="Disconnected" FontSize="24" FontWeight="SemiBold" Foreground="#B6BBC6" /></StackPanel>
+                    <Separator />
+                    <StackPanel><TextBlock Text="BATTERY" Opacity="0.65" /><TextBlock x:Name="BatteryText" Text="—" FontSize="36" FontWeight="Bold" /><TextBlock x:Name="BatteryStateText" Text="—" Foreground="#B6BBC6" /><TextBlock x:Name="BatteryDetailText" Text="—" Opacity="0.7" /></StackPanel>
+                    <StackPanel><TextBlock Text="LOAD" Opacity="0.65" /><TextBlock x:Name="LoadText" Text="—" FontSize="36" FontWeight="Bold" /><TextBlock x:Name="LoadDetailText" Text="—" Opacity="0.7" /></StackPanel>
+                    <StackPanel><TextBlock Text="OUTPUT" Opacity="0.65" /><TextBlock x:Name="OutputPowerText" Text="—" FontSize="28" FontWeight="Bold" /><TextBlock x:Name="OutputDetailText" Text="—" Opacity="0.7" /><TextBlock x:Name="PowerCalculationText" Text="—" Opacity="0.55" TextWrapping="Wrap" /></StackPanel>
+                    <StackPanel><TextBlock Text="RUNTIME" Opacity="0.65" /><TextBlock x:Name="RuntimeText" Text="—" FontSize="28" FontWeight="Bold" /><TextBlock Text="Estimated" Opacity="0.7" /></StackPanel>
+                    <StackPanel><TextBlock Text="TEMPERATURE" Opacity="0.65" /><TextBlock x:Name="UpsTemperatureText" Text="UPS: —" /><TextBlock x:Name="BatteryTemperatureText" Text="Battery: —" Opacity="0.7" /></StackPanel>
+                    <StackPanel><TextBlock Text="POWER FACTOR" Opacity="0.65" /><TextBlock x:Name="InputPowerFactorDisplayText" Text="Input: —" /><TextBlock x:Name="OutputPowerFactorDisplayText" Text="Output: —" Opacity="0.7" /></StackPanel>
+                    <StackPanel><TextBlock Text="SHUTDOWN" Opacity="0.65" /><TextBlock x:Name="ShutdownStatusText" Text="—" Opacity="0.7" TextWrapping="Wrap" /></StackPanel>
+                </StackPanel>
+            </Border>
+            <TextBlock x:Name="FooterConnectionText" Grid.Row="1" Grid.ColumnSpan="2" Text="Not connected" Opacity="0.6" />
+        </Grid>
+        <Border Grid.Row="2" Padding="24,10" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,1,0,0"><TextBlock Text="WinNUT Avalonia preview" Opacity="0.6" /></Border>
+
+        <Border x:Name="SettingsFlyout" Grid.Row="1" IsVisible="False" Margin="24" Padding="0" CornerRadius="14" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+            <Grid ColumnDefinitions="195,*">
+                <Border Padding="18" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,1,0">
+                    <StackPanel Spacing="14">
+                        <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Settings" FontSize="20" FontWeight="SemiBold" /><Button Grid.Column="1" Content="×" Click="CloseSettingsButton_OnClick" /></Grid>
+                        <Button Content="General" HorizontalContentAlignment="Left" Click="GeneralSettingsButton_OnClick" />
+                        <Button Content="Calibration" HorizontalContentAlignment="Left" Click="CalibrationSettingsButton_OnClick" />
+                        <Button Content="Notifications" HorizontalContentAlignment="Left" Click="NotificationsSettingsButton_OnClick" />
+                        <Button Content="Shutdown" HorizontalContentAlignment="Left" Click="ShutdownSettingsButton_OnClick" />
+                        <Button Content="Application" HorizontalContentAlignment="Left" Click="ApplicationSettingsButton_OnClick" />
+                        <Button Content="Updates" HorizontalContentAlignment="Left" Click="UpdatesSettingsButton_OnClick" />
+                        <Button Content="Appearance" HorizontalContentAlignment="Left" Click="AppearanceSettingsButton_OnClick" />
+                        <Button Content="About" HorizontalContentAlignment="Left" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Padding="22">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                    <StackPanel x:Name="GeneralSettingsPanel" Spacing="12">
+                        <TextBlock Text="General" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="NUT server" FontWeight="SemiBold" />
+                        <TextBox x:Name="HostText" PlaceholderText="Host" />
+                        <TextBox x:Name="PortText" PlaceholderText="Port" />
+                        <TextBox x:Name="UpsNameText" PlaceholderText="UPS name" />
+                        <TextBox x:Name="UsernameText" PlaceholderText="Username (optional)" />
+                        <TextBox x:Name="PasswordText" PlaceholderText="Password (optional)" PasswordChar="●" />
+                        <CheckBox x:Name="AutoReconnectCheck" Content="Reconnect automatically" />
+                        <TextBox x:Name="PollIntervalText" PlaceholderText="Polling interval (seconds)" />
+                        <StackPanel Orientation="Horizontal" Spacing="10"><Button Content="Connect" Click="ConnectButton_OnClick" /><Button Content="Refresh" Click="RefreshButton_OnClick" /></StackPanel>
+                        <TextBlock x:Name="ConnectionState" Text="Not connected" Opacity="0.7" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel x:Name="AppearanceSettingsPanel" IsVisible="False" Spacing="14">
+                        <TextBlock Text="Appearance" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="Theme" FontWeight="SemiBold" />
+                        <ComboBox x:Name="ThemeSelector" SelectedIndex="0" SelectionChanged="ThemeSelector_OnSelectionChanged">
+                            <ComboBoxItem Content="Use Windows setting" />
+                            <ComboBoxItem Content="Light" />
+                            <ComboBoxItem Content="Dark" />
+                        </ComboBox>
+                        <TextBlock Text="System follows the Windows appearance setting." Opacity="0.7" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel x:Name="CalibrationSettingsPanel" IsVisible="False" Spacing="14">
+                        <TextBlock Text="Calibration" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="Used only when the UPS does not report real output watts." Opacity="0.7" TextWrapping="Wrap" />
+                        <TextBlock Text="SRVSPM3KIL profile: 2,400 W / 3,000 VA / rated PF 0.80. Input PF specification is 0.95; output-load PF must match connected equipment." Opacity="0.7" TextWrapping="Wrap" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Input voltage range (V)" /><StackPanel Orientation="Horizontal" Spacing="8"><TextBox x:Name="InputVoltageMinimumText" Width="80" /><TextBox x:Name="InputVoltageMaximumText" Width="80" /></StackPanel></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported input voltage" Opacity="0.65" /><TextBox x:Name="NutInputVoltageText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Input frequency: nominal / min / max (Hz)" /><StackPanel Orientation="Horizontal" Spacing="8"><TextBox x:Name="NominalInputFrequencyText" Width="60" /><TextBox x:Name="InputFrequencyMinimumText" Width="60" /><TextBox x:Name="InputFrequencyMaximumText" Width="60" /></StackPanel></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported input frequency" Opacity="0.65" /><TextBox x:Name="NutInputFrequencyText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Output voltage range (V)" /><StackPanel Orientation="Horizontal" Spacing="8"><TextBox x:Name="OutputVoltageMinimumText" Width="80" /><TextBox x:Name="OutputVoltageMaximumText" Width="80" /></StackPanel></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported output voltage" Opacity="0.65" /><TextBox x:Name="NutOutputVoltageText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Battery voltage range (V)" /><StackPanel Orientation="Horizontal" Spacing="8"><TextBox x:Name="BatteryVoltageMinimumText" Width="80" /><TextBox x:Name="BatteryVoltageMaximumText" Width="80" /></StackPanel></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported battery voltage" Opacity="0.65" /><TextBox x:Name="NutBatteryVoltageText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Input power factor" /><TextBox x:Name="InputPowerFactorText" /></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported input PF" Opacity="0.65" /><TextBox x:Name="NutInputPowerFactorText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Output-load power factor" /><TextBox x:Name="OutputLoadPowerFactorText" /></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported output PF" Opacity="0.65" /><TextBox x:Name="NutOutputPowerFactorText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Nominal real output power (W; 0 to use VA)" /><TextBox x:Name="NominalOutputPowerText" /></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="NUT reported output frequency" Opacity="0.65" /><TextBox x:Name="NutOutputFrequencyText" IsReadOnly="True" Opacity="0.6" /></StackPanel></Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14"><StackPanel Spacing="5"><TextBlock Text="Nominal apparent output (VA)" /><TextBox x:Name="NominalOutputPowerVaText" /></StackPanel><StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="Rated output PF (for VA fallback)" /><TextBox x:Name="RatedOutputPowerFactorText" /></StackPanel></Grid>
+                        <Button Content="Save calibration" Click="SaveCalibrationButton_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel x:Name="NotificationsSettingsPanel" IsVisible="False" Spacing="12">
+                        <TextBlock Text="Notifications" FontSize="20" FontWeight="SemiBold" />
+                        <CheckBox x:Name="NotifyConnectionCheck" Content="Notify when connection status changes" />
+                        <CheckBox x:Name="NotifyLowBatteryCheck" Content="Warn on low battery" />
+                        <TextBlock Text="Low-battery threshold (%)" /><TextBox x:Name="LowBatteryThresholdText" />
+                        <TextBlock Text="High UPS temperature threshold (°C)" /><TextBox x:Name="HighUpsTemperatureText" />
+                        <Button Content="Save notifications" Click="SaveNotificationsButton_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel x:Name="ShutdownSettingsPanel" IsVisible="False" Spacing="12">
+                        <TextBlock Text="Shutdown" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="These thresholds are saved for the shutdown workflow." Opacity="0.7" TextWrapping="Wrap" />
+                        <CheckBox x:Name="ImmediateShutdownCheck" Content="Immediate shutdown" />
+                        <CheckBox x:Name="RespectFsdCheck" Content="Respect forced shutdown (FSD)" />
+                        <TextBlock Text="Battery threshold (%)" /><TextBox x:Name="ShutdownBatteryThresholdText" />
+                        <TextBlock Text="Runtime threshold (seconds)" /><TextBox x:Name="ShutdownRuntimeText" />
+                        <TextBlock Text="Shutdown type" /><ComboBox x:Name="ShutdownTypeSelector"><ComboBoxItem Content="System and UPS" /><ComboBoxItem Content="System only" /><ComboBoxItem Content="UPS only" /></ComboBox>
+                        <TextBlock Text="Shutdown delay (seconds)" /><TextBox x:Name="ShutdownDelayText" />
+                        <CheckBox x:Name="ExtendShutdownDelayCheck" Content="Extend shutdown delay" />
+                        <TextBlock Text="Extended shutdown delay (seconds)" /><TextBox x:Name="ExtendedShutdownDelayText" />
+                        <CheckBox x:Name="ArmAutomaticSystemShutdownCheck" Content="Arm automatic Windows shutdown" />
+                        <TextBlock Text="When armed, expiry of the low-battery countdown shuts down Windows." Opacity="0.7" TextWrapping="Wrap" />
+                        <Button Content="Save shutdown settings" Click="SaveShutdownButton_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel x:Name="ApplicationSettingsPanel" IsVisible="False" Spacing="12">
+                        <TextBlock Text="Application" FontSize="20" FontWeight="SemiBold" />
+                        <CheckBox x:Name="MinimizeToTrayCheck" Content="Minimize to system tray" />
+                        <CheckBox x:Name="MinimizeOnStartCheck" Content="Start minimized" />
+                        <CheckBox x:Name="CloseToTrayCheck" Content="Close to system tray" />
+                        <CheckBox x:Name="StartWithWindowsCheck" Content="Start with Windows" />
+                        <Separator />
+                        <CheckBox x:Name="LogToFileCheck" Content="Write log to file" />
+                        <TextBlock Text="Log level (0–5)" /><TextBox x:Name="LogLevelText" />
+                        <Button Content="Save application settings" Click="SaveApplicationButton_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel x:Name="UpdatesSettingsPanel" IsVisible="False" Spacing="12">
+                        <TextBlock Text="Updates" FontSize="20" FontWeight="SemiBold" />
+                        <CheckBox x:Name="CheckUpdatesAtStartupCheck" Content="Check for updates at startup" />
+                        <TextBlock Text="Automatic check interval (hours)" /><TextBox x:Name="UpdateCheckDelayText" />
+                        <TextBlock Text="Update branch" /><ComboBox x:Name="UpdateBranchSelector"><ComboBoxItem Content="Stable" /><ComboBoxItem Content="Preview" /></ComboBox>
+                        <Button Content="Save update settings" Click="SaveUpdatesButton_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Check now" Click="CheckForUpdatesButton_OnClick" HorizontalAlignment="Left" />
+                        <TextBlock x:Name="UpdateStatusText" Text="Not checked" Opacity="0.7" TextWrapping="Wrap" />
+                    </StackPanel>
+                    </Grid>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border x:Name="EventsMainPanel" Grid.Row="1" IsVisible="False" Margin="24" Padding="26" CornerRadius="14" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="16">
+                <Grid ColumnDefinitions="Auto,*"><Button Content="← Overview" Click="OverviewButton_OnClick" /><TextBlock Grid.Column="1" Text="Events &amp; logs" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,0,0" /></Grid>
+                <TextBox x:Name="EventFilterText" Grid.Row="1" PlaceholderText="Filter current-session events" TextChanged="EventFilterText_OnTextChanged" />
+                <TextBox x:Name="EventLogText" Grid.Row="2" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10"><Button Content="Export current events" Click="ExportEventsButton_OnClick" /><Button Content="Open log folder" Click="OpenLogFolderButton_OnClick" /><TextBlock x:Name="LogStatusText" VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" /></StackPanel>
+            </Grid>
+        </Border>
+
+        <Border x:Name="NutMainPanel" Grid.Row="1" IsVisible="False" Margin="24" Padding="26" CornerRadius="14" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="16">
+                <Grid ColumnDefinitions="Auto,*,Auto"><Button Content="← Overview" Click="OverviewButton_OnClick" /><TextBlock Grid.Column="1" Text="NUT variables" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,0,0" /><Button Grid.Column="2" Content="Refresh variables" Click="RefreshNutVariablesButton_OnClick" /></Grid>
+                <TextBox x:Name="NutFilterText" Grid.Row="1" PlaceholderText="Filter variables" TextChanged="NutFilterText_OnTextChanged" />
+                <TextBox x:Name="NutVariablesText" Grid.Row="2" IsReadOnly="True" AcceptsReturn="True" FontFamily="Consolas" TextWrapping="NoWrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                <TextBlock x:Name="NutVariablesStatusText" Grid.Row="3" Text="Connect to load NUT variables." Opacity="0.7" />
+            </Grid>
+        </Border>
+    </Grid>
+
+</Window>
