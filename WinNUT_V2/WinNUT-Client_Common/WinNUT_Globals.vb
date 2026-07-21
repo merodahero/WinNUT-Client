@@ -1,4 +1,6 @@
-﻿Public Module WinNUT_Globals
+﻿Imports System.Windows.Forms
+
+Public Module WinNUT_Globals
 
 #Region "Constants/Shareds"
 
