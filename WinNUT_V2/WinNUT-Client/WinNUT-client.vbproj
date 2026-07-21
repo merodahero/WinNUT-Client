@@ -41,6 +41,7 @@
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <AssemblyTitle>WinNUT Client</AssemblyTitle>
     <Description>WinForms-based client for monitoring your Uninterruptible Power Supply %28UPS%29 connected to a Network UPS Tools %28NUT%29 server.</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DocumentationFile>
