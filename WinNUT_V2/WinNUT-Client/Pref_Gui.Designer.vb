@@ -43,6 +43,17 @@ Partial Class Pref_Gui
         Me.Lbl_Server_IP = New System.Windows.Forms.Label()
         Me.Tab_Calibrage = New System.Windows.Forms.TabPage()
         Me.Cbx_Freq_Input = New System.Windows.Forms.ComboBox()
+        Me.Tb_Cal_InputPowerFactor = New System.Windows.Forms.NumericUpDown()
+        Me.Tb_Cal_OutputLoadPowerFactor = New System.Windows.Forms.NumericUpDown()
+        Me.Tb_Cal_NominalOutputPowerW = New System.Windows.Forms.NumericUpDown()
+        Me.Tb_NutInputPowerFactor = New System.Windows.Forms.TextBox()
+        Me.Tb_NutOutputLoadPowerFactor = New System.Windows.Forms.TextBox()
+        Me.Tb_NutNominalOutputPowerW = New System.Windows.Forms.TextBox()
+        Me.Lbl_InputPowerFactor = New System.Windows.Forms.Label()
+        Me.Lbl_OutputLoadPowerFactor = New System.Windows.Forms.Label()
+        Me.Lbl_NominalOutputPowerW = New System.Windows.Forms.Label()
+        Me.Lbl_UserValues = New System.Windows.Forms.Label()
+        Me.Lbl_NutValues = New System.Windows.Forms.Label()
         Me.Tb_BattV_Max = New System.Windows.Forms.TextBox()
         Me.Tb_OutV_Max = New System.Windows.Forms.TextBox()
         Me.Tb_InF_Max = New System.Windows.Forms.TextBox()
@@ -97,6 +108,9 @@ Partial Class Pref_Gui
         Me.TabControl_Options.SuspendLayout()
         Me.Tab_Connexion.SuspendLayout()
         CType(Me.pollingIntervalValue, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Tb_Cal_InputPowerFactor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Tb_Cal_OutputLoadPowerFactor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Tb_Cal_NominalOutputPowerW, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Tab_Calibrage.SuspendLayout()
         Me.Tab_Miscellanous.SuspendLayout()
         Me.Tab_Shutdown.SuspendLayout()
@@ -226,6 +240,17 @@ Partial Class Pref_Gui
         'Tab_Calibrage
         '
         Me.Tab_Calibrage.Controls.Add(Me.Cbx_Freq_Input)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_Cal_InputPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_Cal_OutputLoadPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_Cal_NominalOutputPowerW)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_NutInputPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_NutOutputLoadPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Tb_NutNominalOutputPowerW)
+        Me.Tab_Calibrage.Controls.Add(Me.Lbl_InputPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Lbl_OutputLoadPowerFactor)
+        Me.Tab_Calibrage.Controls.Add(Me.Lbl_NominalOutputPowerW)
+        Me.Tab_Calibrage.Controls.Add(Me.Lbl_UserValues)
+        Me.Tab_Calibrage.Controls.Add(Me.Lbl_NutValues)
         Me.Tab_Calibrage.Controls.Add(Me.Tb_BattV_Max)
         Me.Tab_Calibrage.Controls.Add(Me.Tb_OutV_Max)
         Me.Tab_Calibrage.Controls.Add(Me.Tb_InF_Max)
@@ -243,8 +268,118 @@ Partial Class Pref_Gui
         Me.Tab_Calibrage.Controls.Add(Me.Lbl_PowerF)
         Me.Tab_Calibrage.Controls.Add(Me.Lbl_InputV)
         resources.ApplyResources(Me.Tab_Calibrage, "Tab_Calibrage")
+        Me.Tab_Calibrage.AutoScroll = True
         Me.Tab_Calibrage.Name = "Tab_Calibrage"
         Me.Tab_Calibrage.UseVisualStyleBackColor = True
+        '
+        'Tb_Cal_InputPowerFactor
+        '
+        Me.Tb_Cal_InputPowerFactor.DecimalPlaces = 2
+        Me.Tb_Cal_InputPowerFactor.Increment = 0.01D
+        Me.Tb_Cal_InputPowerFactor.Location = New System.Drawing.Point(170, 211)
+        Me.Tb_Cal_InputPowerFactor.Maximum = 1.0D
+        Me.Tb_Cal_InputPowerFactor.Minimum = 0.2D
+        Me.Tb_Cal_InputPowerFactor.Name = "Tb_Cal_InputPowerFactor"
+        Me.Tb_Cal_InputPowerFactor.Size = New System.Drawing.Size(64, 20)
+        Me.Tb_Cal_InputPowerFactor.TabIndex = 22
+        Me.Tb_Cal_InputPowerFactor.Value = 0.95D
+        Me.Pref_TlTip.SetToolTip(Me.Tb_Cal_InputPowerFactor, "Input power factor. The SRVSPM3KIL datasheet specifies 0.95.")
+        '
+        'Tb_Cal_OutputLoadPowerFactor
+        '
+        Me.Tb_Cal_OutputLoadPowerFactor.DecimalPlaces = 2
+        Me.Tb_Cal_OutputLoadPowerFactor.Increment = 0.01D
+        Me.Tb_Cal_OutputLoadPowerFactor.Location = New System.Drawing.Point(170, 236)
+        Me.Tb_Cal_OutputLoadPowerFactor.Maximum = 1.0D
+        Me.Tb_Cal_OutputLoadPowerFactor.Minimum = 0.2D
+        Me.Tb_Cal_OutputLoadPowerFactor.Name = "Tb_Cal_OutputLoadPowerFactor"
+        Me.Tb_Cal_OutputLoadPowerFactor.Size = New System.Drawing.Size(64, 20)
+        Me.Tb_Cal_OutputLoadPowerFactor.TabIndex = 23
+        Me.Tb_Cal_OutputLoadPowerFactor.Value = 0.95D
+        Me.Pref_TlTip.SetToolTip(Me.Tb_Cal_OutputLoadPowerFactor, "Power factor of the connected output load. Set this to the measured or known load power factor when available.")
+        '
+        'Tb_Cal_NominalOutputPowerW
+        '
+        Me.Tb_Cal_NominalOutputPowerW.Location = New System.Drawing.Point(170, 261)
+        Me.Tb_Cal_NominalOutputPowerW.Maximum = 100000D
+        Me.Tb_Cal_NominalOutputPowerW.Minimum = 1D
+        Me.Tb_Cal_NominalOutputPowerW.Name = "Tb_Cal_NominalOutputPowerW"
+        Me.Tb_Cal_NominalOutputPowerW.Size = New System.Drawing.Size(64, 20)
+        Me.Tb_Cal_NominalOutputPowerW.TabIndex = 24
+        Me.Tb_Cal_NominalOutputPowerW.Value = 2400D
+        Me.Pref_TlTip.SetToolTip(Me.Tb_Cal_NominalOutputPowerW, "Fallback nominal output power in watts, used with UPS load when NUT does not publish real power.")
+        '
+        'Lbl_InputPowerFactor
+        '
+        Me.Lbl_InputPowerFactor.AutoSize = True
+        Me.Lbl_InputPowerFactor.Location = New System.Drawing.Point(6, 213)
+        Me.Lbl_InputPowerFactor.Name = "Lbl_InputPowerFactor"
+        Me.Lbl_InputPowerFactor.Size = New System.Drawing.Size(42, 13)
+        Me.Lbl_InputPowerFactor.TabIndex = 25
+        Me.Lbl_InputPowerFactor.Text = "Input PF"
+        '
+        'Lbl_OutputLoadPowerFactor
+        '
+        Me.Lbl_OutputLoadPowerFactor.AutoSize = True
+        Me.Lbl_OutputLoadPowerFactor.Location = New System.Drawing.Point(6, 238)
+        Me.Lbl_OutputLoadPowerFactor.Name = "Lbl_OutputLoadPowerFactor"
+        Me.Lbl_OutputLoadPowerFactor.Size = New System.Drawing.Size(48, 13)
+        Me.Lbl_OutputLoadPowerFactor.TabIndex = 26
+        Me.Lbl_OutputLoadPowerFactor.Text = "Output PF"
+        '
+        'Lbl_NominalOutputPowerW
+        '
+        Me.Lbl_NominalOutputPowerW.AutoSize = True
+        Me.Lbl_NominalOutputPowerW.Location = New System.Drawing.Point(6, 263)
+        Me.Lbl_NominalOutputPowerW.Name = "Lbl_NominalOutputPowerW"
+        Me.Lbl_NominalOutputPowerW.Size = New System.Drawing.Size(36, 13)
+        Me.Lbl_NominalOutputPowerW.TabIndex = 27
+        Me.Lbl_NominalOutputPowerW.Text = "Nom. W"
+        '
+        'Tb_NutInputPowerFactor
+        '
+        Me.Tb_NutInputPowerFactor.Location = New System.Drawing.Point(244, 211)
+        Me.Tb_NutInputPowerFactor.Name = "Tb_NutInputPowerFactor"
+        Me.Tb_NutInputPowerFactor.ReadOnly = True
+        Me.Tb_NutInputPowerFactor.Size = New System.Drawing.Size(72, 20)
+        Me.Tb_NutInputPowerFactor.TabIndex = 28
+        Me.Pref_TlTip.SetToolTip(Me.Tb_NutInputPowerFactor, "Power factor reported by NUT. This display does not change the value used for calculations.")
+        '
+        'Tb_NutOutputLoadPowerFactor
+        '
+        Me.Tb_NutOutputLoadPowerFactor.Location = New System.Drawing.Point(244, 236)
+        Me.Tb_NutOutputLoadPowerFactor.Name = "Tb_NutOutputLoadPowerFactor"
+        Me.Tb_NutOutputLoadPowerFactor.ReadOnly = True
+        Me.Tb_NutOutputLoadPowerFactor.Size = New System.Drawing.Size(72, 20)
+        Me.Tb_NutOutputLoadPowerFactor.TabIndex = 29
+        Me.Pref_TlTip.SetToolTip(Me.Tb_NutOutputLoadPowerFactor, "Power factor reported by NUT. This display does not change the value used for calculations.")
+        '
+        'Tb_NutNominalOutputPowerW
+        '
+        Me.Tb_NutNominalOutputPowerW.Location = New System.Drawing.Point(244, 261)
+        Me.Tb_NutNominalOutputPowerW.Name = "Tb_NutNominalOutputPowerW"
+        Me.Tb_NutNominalOutputPowerW.ReadOnly = True
+        Me.Tb_NutNominalOutputPowerW.Size = New System.Drawing.Size(72, 20)
+        Me.Tb_NutNominalOutputPowerW.TabIndex = 30
+        Me.Pref_TlTip.SetToolTip(Me.Tb_NutNominalOutputPowerW, "Nominal output power reported by NUT. This display does not change the value used for calculations.")
+        '
+        'Lbl_UserValues
+        '
+        Me.Lbl_UserValues.AutoSize = True
+        Me.Lbl_UserValues.Location = New System.Drawing.Point(170, 194)
+        Me.Lbl_UserValues.Name = "Lbl_UserValues"
+        Me.Lbl_UserValues.Size = New System.Drawing.Size(28, 13)
+        Me.Lbl_UserValues.TabIndex = 31
+        Me.Lbl_UserValues.Text = "User"
+        '
+        'Lbl_NutValues
+        '
+        Me.Lbl_NutValues.AutoSize = True
+        Me.Lbl_NutValues.Location = New System.Drawing.Point(244, 194)
+        Me.Lbl_NutValues.Name = "Lbl_NutValues"
+        Me.Lbl_NutValues.Size = New System.Drawing.Size(29, 13)
+        Me.Lbl_NutValues.TabIndex = 32
+        Me.Lbl_NutValues.Text = "NUT"
         '
         'Cbx_Freq_Input
         '
@@ -320,8 +455,13 @@ Partial Class Pref_Gui
         'Lbl_LoadUPS
         '
         resources.ApplyResources(Me.Lbl_LoadUPS, "Lbl_LoadUPS")
+        Me.Lbl_LoadUPS.AutoEllipsis = True
+        Me.Lbl_LoadUPS.AutoSize = False
         Me.Lbl_LoadUPS.ForeColor = System.Drawing.SystemColors.GrayText
         Me.Lbl_LoadUPS.Name = "Lbl_LoadUPS"
+        Me.Lbl_LoadUPS.Location = New System.Drawing.Point(6, 288)
+        Me.Lbl_LoadUPS.Size = New System.Drawing.Size(310, 16)
+        Me.Pref_TlTip.SetToolTip(Me.Lbl_LoadUPS, "Shows whether the active power calculation is using a NUT value or a Preferences fallback.")
         '
         'Lbl_OutputV
         '
@@ -603,6 +743,9 @@ Partial Class Pref_Gui
         Me.Tab_Connexion.ResumeLayout(False)
         Me.Tab_Connexion.PerformLayout()
         CType(Me.pollingIntervalValue, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Tb_Cal_InputPowerFactor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Tb_Cal_OutputLoadPowerFactor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Tb_Cal_NominalOutputPowerW, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Tab_Calibrage.ResumeLayout(False)
         Me.Tab_Calibrage.PerformLayout()
         Me.Tab_Miscellanous.ResumeLayout(False)
@@ -641,6 +784,17 @@ Partial Class Pref_Gui
     Friend WithEvents Lbl_Maxi As Label
     Friend WithEvents Lbl_Mini As Label
     Friend WithEvents Cbx_Freq_Input As ComboBox
+    Friend WithEvents Tb_Cal_InputPowerFactor As NumericUpDown
+    Friend WithEvents Tb_Cal_OutputLoadPowerFactor As NumericUpDown
+    Friend WithEvents Tb_Cal_NominalOutputPowerW As NumericUpDown
+    Friend WithEvents Tb_NutInputPowerFactor As TextBox
+    Friend WithEvents Tb_NutOutputLoadPowerFactor As TextBox
+    Friend WithEvents Tb_NutNominalOutputPowerW As TextBox
+    Friend WithEvents Lbl_InputPowerFactor As Label
+    Friend WithEvents Lbl_OutputLoadPowerFactor As Label
+    Friend WithEvents Lbl_NominalOutputPowerW As Label
+    Friend WithEvents Lbl_UserValues As Label
+    Friend WithEvents Lbl_NutValues As Label
     Friend WithEvents Tb_BattV_Max As TextBox
     Friend WithEvents Tb_OutV_Max As TextBox
     Friend WithEvents Tb_InF_Max As TextBox

@@ -110,6 +110,15 @@
     <Setting Name="CAL_BattVMax" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">18</Value>
     </Setting>
+    <Setting Name="CAL_InputPowerFactor" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.95</Value>
+    </Setting>
+    <Setting Name="CAL_OutputLoadPowerFactor" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.95</Value>
+    </Setting>
+    <Setting Name="CAL_NominalOutputPowerW" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2400</Value>
+    </Setting>
     <Setting Name="IsFirstRun" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>

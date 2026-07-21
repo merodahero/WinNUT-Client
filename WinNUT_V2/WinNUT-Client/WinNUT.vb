@@ -369,6 +369,9 @@ Public Class WinNUT
                                        My.Settings.NUT_UPSName,
                                        My.Settings.NUT_AutoReconnect)
 
+        UPS_Device.RuntimeConfig.InputPowerFactor = My.Settings.CAL_InputPowerFactor
+        UPS_Device.RuntimeConfig.OutputLoadPowerFactor = My.Settings.CAL_OutputLoadPowerFactor
+        UPS_Device.RuntimeConfig.NominalOutputPowerW = My.Settings.CAL_NominalOutputPowerW
         UPS_Device = New UPS_Device(Nut_Config, LogFile, My.Settings.NUT_PollIntervalMsec, My.Settings.CAL_FreqInNom)
         AddHandler UPS_Device.EncounteredNUTException, AddressOf HandleNUTException
         UPS_Device.Connect_UPS(retryOnConnFailure)
