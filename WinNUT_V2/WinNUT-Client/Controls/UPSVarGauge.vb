@@ -197,24 +197,23 @@ Namespace Controls
                                               2 * baseArcRadius,
                                               2 * baseArcRadius)
 
-                    ' Always render gradient if GradientType is RedGreen
-                    If m_gradientType = GradientTypeEnum.RedGreen AndAlso rect.Width > 0 AndAlso rect.Height > 0 Then
-                        ' Create gradient brush with simple vertical gradient
-                        Using brush As New LinearGradientBrush(rect, Color.Red, Color.Green,
-                                                              LinearGradientMode.Vertical)
+                    ' ALWAYS use gradient - ignore the GradientType setting for now to test
+                    ' Create gradient brush with simple vertical gradient
+                    If rect.Width > 1 AndAlso rect.Height > 1 Then
+                        Using brush As New LinearGradientBrush(rect, Color.Red, Color.Lime, 90.0F)
                             Using pnArc = New Pen(brush, scaledWidth)
                                 graphics.DrawArc(pnArc, rect, 135, 270)
                             End Using
                         End Using
                     Else
-                        ' Render with solid color
-                        Using pnArc = New Pen(BaseArcColor, scaledWidth)
+                        ' Fallback if rect is too small
+                        Using pnArc = New Pen(Color.Red, scaledWidth)
                             graphics.DrawArc(pnArc, rect, 135, 270)
                         End Using
                     End If
                 End If
             Catch ex As Exception
-                ' If gradient fails, fall back to solid gray arc
+                ' If anything fails, draw a bright red arc so we know something happened
                 Try
                     If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
                         Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
@@ -223,12 +222,12 @@ Namespace Controls
                                                   Center.Y - baseArcRadius,
                                                   2 * baseArcRadius,
                                                   2 * baseArcRadius)
-                        Using pnArc = New Pen(Color.Gray, scaledWidth)
+                        Using pnArc = New Pen(Color.Magenta, scaledWidth)
                             graphics.DrawArc(pnArc, rect, 135, 270)
                         End Using
                     End If
                 Catch
-                    ' Silently fail if even the fallback doesn't work
+                    ' Silently fail
                 End Try
             End Try
         End Sub
