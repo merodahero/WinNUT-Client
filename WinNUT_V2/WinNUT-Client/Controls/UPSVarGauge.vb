@@ -185,36 +185,52 @@ Namespace Controls
         End Sub
 
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
-            ' Use the base class properties
-            If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
-                Dim baseArcRadius As Integer = CInt(baseArcRadius * centerFactor)
-                Dim scaledWidth As Single = BaseArcWidth * centerFactor
+            Try
+                ' Use the base class properties
+                If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
+                    Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
+                    Dim scaledWidth As Single = BaseArcWidth * centerFactor
 
-                ' Always render gradient if GradientType is RedGreen, otherwise use base color
-                If m_gradientType = GradientTypeEnum.RedGreen Then
-                    ' Create gradient brush with simple vertical gradient
+                    ' Create the rectangle for the arc
                     Dim rect As New Rectangle(Center.X - baseArcRadius,
                                               Center.Y - baseArcRadius,
                                               2 * baseArcRadius,
                                               2 * baseArcRadius)
 
-                    Using brush As New LinearGradientBrush(rect, Color.Red, Color.Green,
-                                                          LinearGradientMode.Vertical)
-                        Using pnArc = New Pen(brush, scaledWidth)
+                    ' Always render gradient if GradientType is RedGreen
+                    If m_gradientType = GradientTypeEnum.RedGreen AndAlso rect.Width > 0 AndAlso rect.Height > 0 Then
+                        ' Create gradient brush with simple vertical gradient
+                        Using brush As New LinearGradientBrush(rect, Color.Red, Color.Green,
+                                                              LinearGradientMode.Vertical)
+                            Using pnArc = New Pen(brush, scaledWidth)
+                                graphics.DrawArc(pnArc, rect, 135, 270)
+                            End Using
+                        End Using
+                    Else
+                        ' Render with solid color
+                        Using pnArc = New Pen(BaseArcColor, scaledWidth)
                             graphics.DrawArc(pnArc, rect, 135, 270)
                         End Using
-                    End Using
-                Else
-                    ' Render with solid color
-                    Using pnArc = New Pen(BaseArcColor, scaledWidth)
-                        graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
-                                                                  Center.Y - baseArcRadius,
-                                                                  2 * baseArcRadius,
-                                                                  2 * baseArcRadius),
-                                             135, 270)
-                    End Using
+                    End If
                 End If
-            End If
+            Catch ex As Exception
+                ' If gradient fails, fall back to solid gray arc
+                Try
+                    If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
+                        Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
+                        Dim scaledWidth As Single = BaseArcWidth * centerFactor
+                        Dim rect As New Rectangle(Center.X - baseArcRadius,
+                                                  Center.Y - baseArcRadius,
+                                                  2 * baseArcRadius,
+                                                  2 * baseArcRadius)
+                        Using pnArc = New Pen(Color.Gray, scaledWidth)
+                            graphics.DrawArc(pnArc, rect, 135, 270)
+                        End Using
+                    End If
+                Catch
+                    ' Silently fail if even the fallback doesn't work
+                End Try
+            End Try
         End Sub
 
         ''' <summary>
