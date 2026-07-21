@@ -306,12 +306,16 @@ Namespace Controls
                 ' Scale to fill 90% of the available space instead of using a fixed 200px reference
                 centerFactor = If(minSize > 0, (minSize * 0.9F) / 160.0F, 1.0F)
 
-                ' Render components
-                RenderDefaultArc(g)
+                ' Render the scale first, then the arc. Derived controls use the arc
+                ' for their coloured band; drawing it after the dense tick marks keeps
+                ' that band visible instead of painting it over with black ticks.
                 RenderScaleLines(g)
+                RenderDefaultArc(g)
                 RenderScaleNumbers(g)
                 RenderNeedle(g)
                 PostRender(g)
+                ' Allow a final custom overlay while keeping scale ticks on top of it.
+                RenderScaleLines(g)
             Catch ex As Exception
                 ' Prevent paint exceptions from crashing the app
                 System.Diagnostics.Debug.WriteLine($"Gauge paint error: {ex.Message}")

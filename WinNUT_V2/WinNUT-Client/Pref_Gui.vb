@@ -1,4 +1,4 @@
-﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
+' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
 ' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -176,7 +176,7 @@ Public Class Pref_Gui
         Catch Except As Exception
             IsShowed = False
             Close()
-            LogFile.LogTracing("Error on Opening Pref_Gui:" & vbNewLine & Except.ToString(), LogLvl.LOG_ERROR, Me)
+            LogFile.LogTracing("Error on Opening Pref_Gui:" & Environment.NewLine & Except.ToString(), LogLvl.LOG_ERROR, Me)
         End Try
     End Sub
 

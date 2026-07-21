@@ -55,6 +55,7 @@ Namespace Controls
 
         Private m_gradientType = GradientTypeEnum.RedGreen
         Private m_gradientOrientation = GradientOrientationEnum.BottomToTop
+        Private m_colorProfile = GaugeColorProfile.CenterNormal
         Private m_unitvalue1 = UnitValueEnum.Volts
         Private m_unitvalue2 = UnitValueEnum.None
 
@@ -122,6 +123,21 @@ Namespace Controls
 
         <Browsable(True),
                 Category("AGauge"),
+                Description("Semantic colour profile for this UPS measurement.")>
+        Public Property ColorProfile As GaugeColorProfile
+            Get
+                Return m_colorProfile
+            End Get
+            Set(value As GaugeColorProfile)
+                If m_colorProfile <> value Then
+                    m_colorProfile = value
+                    Invalidate()
+                End If
+            End Set
+        End Property
+
+        <Browsable(True),
+                Category("AGauge"),
                 Description("Units For Value 1")>
         Public Property UnitValue1 As UnitValueEnum
             Get
@@ -166,6 +182,15 @@ Namespace Controls
             LeftToRight
         End Enum
 
+        Public Enum GaugeColorProfile
+            ' Low and high readings are unsafe; the nominal middle band is healthy.
+            CenterNormal
+            ' Higher readings are healthier, such as battery charge or battery voltage.
+            IncreasingHealthy
+            ' Higher readings are riskier, such as UPS load.
+            IncreasingRisk
+        End Enum
+
         Public Enum UnitValueEnum
             None
             Hertz
@@ -185,57 +210,15 @@ Namespace Controls
         End Sub
 
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
-            Try
-                ' Use the base class properties
-                If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
-                    Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
-                    Dim scaledWidth As Single = BaseArcWidth * centerFactor
-
-                    ' Create the rectangle for the arc
-                    Dim rect As New Rectangle(Center.X - baseArcRadius,
-                                              Center.Y - baseArcRadius,
-                                              2 * baseArcRadius,
-                                              2 * baseArcRadius)
-
-                    ' ALWAYS use gradient - ignore the GradientType setting for now to test
-                    ' Create gradient brush with simple vertical gradient
-                    If rect.Width > 1 AndAlso rect.Height > 1 Then
-                        Using brush As New LinearGradientBrush(rect, Color.Red, Color.Lime, 90.0F)
-                            Using pnArc = New Pen(brush, scaledWidth)
-                                graphics.DrawArc(pnArc, rect, 135, 270)
-                            End Using
-                        End Using
-                    Else
-                        ' Fallback if rect is too small
-                        Using pnArc = New Pen(Color.Red, scaledWidth)
-                            graphics.DrawArc(pnArc, rect, 135, 270)
-                        End Using
-                    End If
-                End If
-            Catch ex As Exception
-                ' If anything fails, draw a bright red arc so we know something happened
-                Try
-                    If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
-                        Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
-                        Dim scaledWidth As Single = BaseArcWidth * centerFactor
-                        Dim rect As New Rectangle(Center.X - baseArcRadius,
-                                                  Center.Y - baseArcRadius,
-                                                  2 * baseArcRadius,
-                                                  2 * baseArcRadius)
-                        Using pnArc = New Pen(Color.Magenta, scaledWidth)
-                            graphics.DrawArc(pnArc, rect, 135, 270)
-                        End Using
-                    End If
-                Catch
-                    ' Silently fail
-                End Try
-            End Try
+            ' The gradient is drawn once in PostRender, after all base painting.
         End Sub
 
         ''' <summary>
         ''' Override PostRender and render the value of the gauge with unit.
         ''' </summary>
         Protected Overrides Sub PostRender(graphics As Graphics)
+            RenderGradientOverlay(graphics)
+
             Dim PenString = New Pen(Color.Black)
             Dim PenFontV1 = New Font("Microsoft Sans Serif", 8, FontStyle.Bold)
             Dim PenFontV2 = New Font("Microsoft Sans Serif", 7, FontStyle.Bold)
@@ -259,6 +242,43 @@ Namespace Controls
                 graphics.DrawString(StringToDraw, PenFontV2, StringPen,
                                         New PointF((StrPos.X - (StringSize.Width / 2) + 7), StrPos.Y))
             End If
+        End Sub
+
+        ''' <summary>
+        ''' Draw the coloured band after the base gauge has rendered its scale.
+        ''' PostRender is known to run for every visible gauge, so this avoids the
+        ''' inherited arc path being obscured or skipped during custom painting.
+        ''' </summary>
+        Private Sub RenderGradientOverlay(graphics As Graphics)
+            Dim radius As Integer = Math.Max(1, CInt(Math.Min(Width, Height) * 0.39F))
+            Dim strokeWidth As Single = Math.Max(4.0F, BaseArcWidth * centerFactor)
+            Dim rect As New Rectangle(Center.X - radius, Center.Y - radius, radius * 2, radius * 2)
+
+            Dim colors As Color()
+            Dim thresholds As Single()
+
+            Select Case ColorProfile
+                Case GaugeColorProfile.IncreasingHealthy
+                    ' Battery: low charge/voltage is critical; the upper half is healthy.
+                    colors = {Color.Firebrick, Color.Goldenrod, Color.ForestGreen}
+                    thresholds = {0.0F, 0.25F, 0.5F, 1.0F}
+                Case GaugeColorProfile.IncreasingRisk
+                    ' Load: low utilisation is healthy; near capacity is critical.
+                    colors = {Color.ForestGreen, Color.Goldenrod, Color.Firebrick}
+                    thresholds = {0.0F, 0.6F, 0.8F, 1.0F}
+                Case Else
+                    ' Voltage/frequency: both extremes are unsafe; the central band is normal.
+                    colors = {Color.Firebrick, Color.Goldenrod, Color.ForestGreen, Color.Goldenrod, Color.Firebrick}
+                    thresholds = {0.0F, 0.1F, 0.2F, 0.8F, 0.9F, 1.0F}
+            End Select
+
+            For index As Integer = 0 To colors.Length - 1
+                Dim startAngle As Single = 135.0F + (270.0F * thresholds(index))
+                Dim sweepAngle As Single = 270.0F * (thresholds(index + 1) - thresholds(index))
+                Using pen As New Pen(colors(index), strokeWidth)
+                    graphics.DrawArc(pen, rect, startAngle, sweepAngle)
+                End Using
+            Next
         End Sub
 
         Private Function ApplyUnit(value As Single, unit As UnitValueEnum) As String

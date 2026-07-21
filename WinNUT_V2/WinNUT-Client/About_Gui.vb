@@ -1,4 +1,4 @@
-﻿' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
+' WinNUT-Client is a NUT windows client for monitoring your ups hooked up to your favorite linux server.
 ' Copyright (C) 2019-2021 Gawindx (Decaux Nicolas)
 '
 ' This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -11,8 +11,8 @@ Imports WinNUT_Client_Common
 
 Public Class About_Gui
     Private Sub About_Gui_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Lbl_ProgNameVersion.Text = ProgramName & vbNewLine & "Version " & ProgramVersion
-        Lbl_Copyright_2019.Text = Replace(Copyright, "©", vbNewLine & "©")
+        Lbl_ProgNameVersion.Text = ProgramName & Environment.NewLine & "Version " & ProgramVersion
+        Lbl_Copyright_2019.Text = Replace(Copyright, "©", Environment.NewLine & "©")
         LkLbl_Github.Text = GitHubURL
         Icon = WinNUT.Icon
         ' Me.LogFile = WinNUT.LogFile

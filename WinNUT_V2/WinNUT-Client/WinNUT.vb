@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports WinNUT_Client_Common
 
 Public Class WinNUT
@@ -479,7 +479,7 @@ Public Class WinNUT
 
     Private Sub Event_UpdateNotifyIconStr(Optional Reason As String = Nothing, Optional Message As String = Nothing) Handles Me.UpdateNotifyIconStr
         Dim ShowVersion As String = ShortProgramVersion
-        Dim NotifyStr As String = ProgramName & " - " & ShowVersion & vbNewLine
+        Dim NotifyStr As String = ProgramName & " - " & ShowVersion & Environment.NewLine
         Dim FormText As String = ProgramName
         Select Case Reason
             Case Nothing
@@ -488,7 +488,7 @@ Public Class WinNUT
                     FormText &= " - " & StrLog.Item(AppResxStr.STR_MAIN_NOTCONN)
                 End If
             Case "Retry"
-                NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_RECONNECT) & vbNewLine
+                NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_RECONNECT) & Environment.NewLine
                 NotifyStr &= Message
                 FormText &= " - Bat: " & UPS_BattCh & "% - " & StrLog.Item(AppResxStr.STR_MAIN_RECONNECT) & " - " & Message
             Case "Connected"
@@ -505,12 +505,12 @@ Public Class WinNUT
                 FormText &= " - " & String.Format(StrLog.Item(AppResxStr.STR_MAIN_LOSTCONNECT), UPS_Device.Nut_Config.Host, UPS_Device.Nut_Config.Port)
             Case "Update Data"
                 FormText &= " - Bat: " & UPS_BattCh & "% - " & StrLog.Item(AppResxStr.STR_MAIN_CONN) & " - "
-                NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_CONN) & vbNewLine
+                NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_CONN) & Environment.NewLine
                 If UPS_Device.UPS_Datas.UPS_Value.UPS_Status.HasFlag(UPS_States.OL) Then
-                    NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_OL) & vbNewLine
+                    NotifyStr &= StrLog.Item(AppResxStr.STR_MAIN_OL) & Environment.NewLine
                     FormText &= StrLog.Item(AppResxStr.STR_MAIN_OL) & " - "
                 Else
-                    NotifyStr &= String.Format(StrLog.Item(AppResxStr.STR_MAIN_OB), UPS_Device.UPS_Datas.UPS_Value.Batt_Charge) & vbNewLine
+                    NotifyStr &= String.Format(StrLog.Item(AppResxStr.STR_MAIN_OB), UPS_Device.UPS_Datas.UPS_Value.Batt_Charge) & Environment.NewLine
                     FormText &= String.Format(StrLog.Item(AppResxStr.STR_MAIN_OB), UPS_Device.UPS_Datas.UPS_Value.Batt_Charge) & " - "
                 End If
                 Select Case UPS_Device.UPS_Datas.UPS_Value.Batt_Charge
@@ -533,7 +533,7 @@ Public Class WinNUT
         End If
         Me.FormText = FormText
 
-        LogFile.LogTracing("NotifyIcon Text => " & vbNewLine & NotifyStr, LogLvl.LOG_DEBUG, Me)
+        LogFile.LogTracing("NotifyIcon Text => " & Environment.NewLine & NotifyStr, LogLvl.LOG_DEBUG, Me)
     End Sub
 
     Private Sub Event_UpdateBatteryState(Optional Reason As String = Nothing) Handles Me.UpdateBatteryState

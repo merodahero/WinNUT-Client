@@ -386,6 +386,7 @@ Partial Class WinNUT
         Me.AG_InV.BaseArcWidth = 8
         Me.AG_InV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_InV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_InV.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.CenterNormal
         resources.ApplyResources(Me.AG_InV, "AG_InV")
         Me.AG_InV.MaxValue = 100
         Me.AG_InV.MinValue = 0
@@ -424,6 +425,7 @@ Partial Class WinNUT
         Me.AG_OutV.BaseArcWidth = 8
         Me.AG_OutV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_OutV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_OutV.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.CenterNormal
         resources.ApplyResources(Me.AG_OutV, "AG_OutV")
         Me.AG_OutV.MaxValue = 100
         Me.AG_OutV.MinValue = 0
@@ -474,6 +476,7 @@ Partial Class WinNUT
         Me.AG_BattCh.BaseArcWidth = 8
         Me.AG_BattCh.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.LeftToRight
         Me.AG_BattCh.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_BattCh.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.IncreasingHealthy
         resources.ApplyResources(Me.AG_BattCh, "AG_BattCh")
         Me.AG_BattCh.MaxValue = 100
         Me.AG_BattCh.MinValue = 0
@@ -507,6 +510,7 @@ Partial Class WinNUT
         Me.AG_Load.BaseArcWidth = 8
         Me.AG_Load.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.RightToLeft
         Me.AG_Load.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_Load.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.IncreasingRisk
         resources.ApplyResources(Me.AG_Load, "AG_Load")
         Me.AG_Load.MaxValue = 100
         Me.AG_Load.MinValue = 0
@@ -545,6 +549,7 @@ Partial Class WinNUT
         Me.AG_BattV.BaseArcWidth = 8
         Me.AG_BattV.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_BattV.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_BattV.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.IncreasingHealthy
         resources.ApplyResources(Me.AG_BattV, "AG_BattV")
         Me.AG_BattV.MaxValue = 100
         Me.AG_BattV.MinValue = 0
@@ -583,6 +588,7 @@ Partial Class WinNUT
         Me.AG_InF.BaseArcWidth = 8
         Me.AG_InF.GradientOrientation = WinNUT_Client.Controls.UPSVarGauge.GradientOrientationEnum.BottomToTop
         Me.AG_InF.GradientType = WinNUT_Client.Controls.UPSVarGauge.GradientTypeEnum.RedGreen
+        Me.AG_InF.ColorProfile = WinNUT_Client.Controls.UPSVarGauge.GaugeColorProfile.CenterNormal
         resources.ApplyResources(Me.AG_InF, "AG_InF")
         Me.AG_InF.MaxValue = 100
         Me.AG_InF.MinValue = 0
