@@ -26,24 +26,24 @@ Namespace Controls
         Private _minValue As Single = 0
         Private _maxValue As Single = 100
         Private _baseArcColor As Color = Color.Gray
-        Private _baseArcRadius As Integer = 110
+        Private _baseArcRadius As Integer = 70
         Private _baseArcStart As Integer = 135
         Private _baseArcSweep As Integer = 270
-        Private _baseArcWidth As Integer = 12
+        Private _baseArcWidth As Integer = 8
         Private _needleColor1 As Color = Color.Red
         Private _needleColor2 As Color = Color.DimGray
-        Private _needleRadius As Integer = 105
-        Private _needleWidth As Integer = 5
-        Private _scaleNumbersRadius As Integer = 125
+        Private _needleRadius As Integer = 65
+        Private _needleWidth As Integer = 3
+        Private _scaleNumbersRadius As Integer = 85
         Private _scaleNumbersFormat As String = "{0:F0}"
         Private _scaleLinesMajorStepValue As Single = 20
         Private _scaleLinesMinorNumOf As Integer = 9
-        Private _scaleLinesMinorInnerRadius As Integer = 108
-        Private _scaleLinesMinorOuterRadius As Integer = 115
-        Private _scaleLinesMajorInnerRadius As Integer = 105
-        Private _scaleLinesMajorOuterRadius As Integer = 115
-        Private _scaleLinesInterInnerRadius As Integer = 105
-        Private _scaleLinesInterOuterRadius As Integer = 115
+        Private _scaleLinesMinorInnerRadius As Integer = 68
+        Private _scaleLinesMinorOuterRadius As Integer = 75
+        Private _scaleLinesMajorInnerRadius As Integer = 65
+        Private _scaleLinesMajorOuterRadius As Integer = 75
+        Private _scaleLinesInterInnerRadius As Integer = 65
+        Private _scaleLinesInterOuterRadius As Integer = 75
 
         Protected centerFactor As Single = 1.0F
         Protected Center As Point
