@@ -186,12 +186,15 @@ Namespace Controls
 
         Protected Overrides Sub RenderDefaultArc(graphics As Graphics)
             Try
+                System.Diagnostics.Debug.WriteLine($"RenderDefaultArc called: GradientType={m_gradientType}, BaseArcRadius={BaseArcRadius}, centerFactor={centerFactor}")
+
                 ' Use the base class properties instead of local hardcoded values
                 If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
                     Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
                     Dim scaledWidth As Single = BaseArcWidth * centerFactor
 
                     If m_gradientType = GradientTypeEnum.None Then
+                        System.Diagnostics.Debug.WriteLine("Rendering SOLID arc")
                         ' Render with solid color
                         Using pnArc = New Pen(BaseArcColor, scaledWidth)
                             graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
@@ -202,6 +205,7 @@ Namespace Controls
                         End Using
 
                     Else
+                        System.Diagnostics.Debug.WriteLine($"Rendering GRADIENT arc: Orientation={m_gradientOrientation}")
                         ' Render with gradient
                         Dim GradientP1Brush As Point
                         Dim GradientP2Brush As Point
@@ -222,6 +226,8 @@ Namespace Controls
                                 GradientP2Brush = New Point(Center.X + baseArcRadius + gradientMargin, Center.Y)
                         End Select
 
+                        System.Diagnostics.Debug.WriteLine($"Gradient points: P1={GradientP1Brush}, P2={GradientP2Brush}, radius={baseArcRadius}")
+
                         ' Make sure we have valid points for the gradient brush
                         If GradientP1Brush <> GradientP2Brush AndAlso 
                            baseArcRadius > 0 AndAlso scaledWidth > 0 Then
@@ -233,9 +239,11 @@ Namespace Controls
                                                                               2 * baseArcRadius,
                                                                               2 * baseArcRadius),
                                                          135, 270)
+                                    System.Diagnostics.Debug.WriteLine("Gradient arc drawn successfully!")
                                 End Using
                             End Using
                         Else
+                            System.Diagnostics.Debug.WriteLine("Gradient parameters invalid, using gray fallback")
                             ' Fallback to solid gray if gradient parameters are invalid
                             Using pnArc = New Pen(Color.Gray, scaledWidth)
                                 graphics.DrawArc(pnArc, New Rectangle(Center.X - baseArcRadius,
@@ -249,7 +257,8 @@ Namespace Controls
                 End If
             Catch ex As Exception
                 ' Fallback: render with solid color if anything fails
-                System.Diagnostics.Debug.WriteLine($"Gradient arc error: {ex.Message}")
+                System.Diagnostics.Debug.WriteLine($"Gradient arc ERROR: {ex.Message}")
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}")
                 Try
                     If BaseArcRadius > 0 AndAlso centerFactor > 0 Then
                         Dim baseArcRadius As Integer = CInt(BaseArcRadius * centerFactor)
